@@ -1,0 +1,98 @@
+{
+  "greeting": {
+    "role": "ai",
+    "text": "Assalam-o-Alaikum! Tell me what you'd like to order — you can speak or type in English or Urdu."
+  },
+  "quantityWords": {
+    "aik": 1,
+    "ek": 1,
+    "one": 1,
+    "do": 2,
+    "two": 2,
+    "teen": 3,
+    "three": 3,
+    "char": 4,
+    "four": 4,
+    "panch": 5,
+    "five": 5
+  },
+  "removeKeywords": ["remove", "hatao", "delete", "cancel item", "nikal"],
+  "clearKeywords": ["clear cart", "empty cart", "cart khali", "start over"],
+  "intents": [
+    {
+      "id": "browse-products",
+      "keywords": ["show all", "show me", "list all", "list the", "available", "menu for", "dikhao"],
+      "action": "browse-menu",
+      "reply": "Showing all {query} available on the menu.",
+      "fallbackReply": "Opening the complete menu for you.",
+      "suggestions": []
+    },
+    {
+      "id": "repeat-order",
+      "keywords": ["repeat", "last order", "pichla order", "same as last", "dobara"],
+      "action": "repeat-last-order",
+      "reply": "Done — I recreated your last order ({orderId}) in the cart.",
+      "fallbackReply": "I couldn't find a previous order to repeat yet.",
+      "suggestions": ["view-cart", "checkout"]
+    },
+    {
+      "id": "checkout",
+      "keywords": ["checkout", "place order", "order kar do", "confirm order", "pay"],
+      "action": "navigate-checkout",
+      "reply": "Taking you to checkout with {count} item(s), total {total}.",
+      "fallbackReply": "Your cart is empty — add something first and I'll take you to checkout.",
+      "suggestions": []
+    },
+    {
+      "id": "show-cart",
+      "keywords": ["cart", "kitna hua", "total", "my order", "basket"],
+      "action": "summarize-cart",
+      "reply": "Your cart has {count} item(s) for {total}.",
+      "fallbackReply": "Your cart is empty right now.",
+      "suggestions": ["view-cart", "checkout"]
+    },
+    {
+      "id": "recommend",
+      "keywords": ["recommend", "suggest", "kya acha hai", "popular", "best seller"],
+      "action": "recommend",
+      "reply": "These are trending right now — tap any suggestion to add it.",
+      "suggestions": ["add-popular"]
+    },
+    {
+      "id": "thanks",
+      "keywords": ["bas itna", "that's all", "thanks", "shukriya", "done"],
+      "action": "message",
+      "reply": "Perfect. Tap View Cart whenever you're ready to check out.",
+      "suggestions": ["view-cart", "checkout"]
+    },
+    {
+      "id": "greeting",
+      "keywords": ["hello", "hi", "salam", "assalam", "hey"],
+      "action": "message",
+      "reply": "Hi! What can I get for you today?",
+      "suggestions": ["recommend"]
+    }
+  ],
+  "replies": {
+    "added": "Added {items} to your order. Anything else?",
+    "removed": "Removed {items} from your order.",
+    "cleared": "Cart cleared. What would you like instead?",
+    "notFound": "I didn't catch a product in that. Try \"2 zinger burgers aur aik coke\" or tap a suggestion.",
+    "listening": "Listening…"
+  },
+  "simulatedSpeech": [
+    "Mujhe 2 zinger burgers aur aik coke chahiye.",
+    "Add loaded fries please.",
+    "Aik pepperoni pizza aur do coke.",
+    "Kya acha hai aaj?",
+    "Repeat my last order."
+  ],
+  "quickActions": [
+    { "id": "recommend", "label": "What's popular?", "text": "What do you recommend?" },
+    { "id": "add-popular", "label": "Add Fries", "text": "Add loaded fries" },
+    { "id": "add-drink", "label": "Add a Drink", "text": "Add one coke" },
+    { "id": "repeat", "label": "Repeat Last Order", "text": "Repeat my last order" },
+    { "id": "view-cart", "label": "View Cart", "text": "Show my cart" },
+    { "id": "checkout", "label": "Checkout", "text": "Place my order" }
+  ]
+}

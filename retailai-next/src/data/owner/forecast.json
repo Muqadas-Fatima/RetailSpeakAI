@@ -1,0 +1,53 @@
+{
+  "tomorrow": {
+    "needingAttention": 6,
+    "highDemand": 4,
+    "potentialStockouts": 2,
+    "rows": [
+      { "id": "fc-t-1", "product": "Bakery Bread (Milk Loaf)", "currentStock": 4, "predictedDemand": 58, "difference": -54, "daysUntilStockout": 0, "recommendation": "Order 60 loaves today" },
+      { "id": "fc-t-2", "product": "Eggs (Dozen)", "currentStock": 9, "predictedDemand": 32, "difference": -23, "daysUntilStockout": 0, "recommendation": "Order 72 dozen from Shaheen Poultry" },
+      { "id": "fc-t-3", "product": "Fresh Milk 1L", "currentStock": 18, "predictedDemand": 26, "difference": -8, "daysUntilStockout": 1, "recommendation": "Top up 40 litres" },
+      { "id": "fc-t-4", "product": "Zinger Burger Buns", "currentStock": 64, "predictedDemand": 70, "difference": -6, "daysUntilStockout": 1, "recommendation": "Add 5 dozen buns" },
+      { "id": "fc-t-5", "product": "Coke 500ml", "currentStock": 96, "predictedDemand": 44, "difference": 52, "daysUntilStockout": null, "recommendation": "Stock is healthy" }
+    ]
+  },
+  "3-days": {
+    "needingAttention": 9,
+    "highDemand": 6,
+    "potentialStockouts": 4,
+    "rows": [
+      { "id": "fc-3-1", "product": "Bakery Bread (Milk Loaf)", "currentStock": 4, "predictedDemand": 168, "difference": -164, "daysUntilStockout": 0, "recommendation": "Set a daily standing order" },
+      { "id": "fc-3-2", "product": "Chicken Fillet 1kg", "currentStock": 12, "predictedDemand": 88, "difference": -76, "daysUntilStockout": 1, "recommendation": "Order 80kg before Friday" },
+      { "id": "fc-3-3", "product": "Mozzarella Cheese 1kg", "currentStock": 6, "predictedDemand": 34, "difference": -28, "daysUntilStockout": 1, "recommendation": "Order 40kg from Dairy Fresh" },
+      { "id": "fc-3-4", "product": "Eggs (Dozen)", "currentStock": 9, "predictedDemand": 96, "difference": -87, "daysUntilStockout": 0, "recommendation": "Raise PO for 120 dozen" },
+      { "id": "fc-3-5", "product": "Loaded Fries (Frozen 2.5kg)", "currentStock": 41, "predictedDemand": 52, "difference": -11, "daysUntilStockout": 2, "recommendation": "Add 20 packs" },
+      { "id": "fc-3-6", "product": "Fresh Milk 1L", "currentStock": 18, "predictedDemand": 78, "difference": -60, "daysUntilStockout": 1, "recommendation": "Order 90 litres" }
+    ]
+  },
+  "7-days": {
+    "needingAttention": 13,
+    "highDemand": 8,
+    "potentialStockouts": 6,
+    "rows": [
+      { "id": "fc-7-1", "product": "Zinger Burger Buns", "currentStock": 64, "predictedDemand": 490, "difference": -426, "daysUntilStockout": 1, "recommendation": "Weekly standing order of 500" },
+      { "id": "fc-7-2", "product": "Chicken Fillet 1kg", "currentStock": 12, "predictedDemand": 205, "difference": -193, "daysUntilStockout": 1, "recommendation": "Split across two deliveries" },
+      { "id": "fc-7-3", "product": "Coke 500ml", "currentStock": 96, "predictedDemand": 288, "difference": -192, "daysUntilStockout": 2, "recommendation": "Order 24 crates" },
+      { "id": "fc-7-4", "product": "Mozzarella Cheese 1kg", "currentStock": 6, "predictedDemand": 82, "difference": -76, "daysUntilStockout": 1, "recommendation": "Order 90kg" },
+      { "id": "fc-7-5", "product": "Fresh Milk 1L", "currentStock": 18, "predictedDemand": 182, "difference": -164, "daysUntilStockout": 1, "recommendation": "Daily 26L delivery" },
+      { "id": "fc-7-6", "product": "Green Olives Jar 350g", "currentStock": 46, "predictedDemand": 7, "difference": 39, "daysUntilStockout": null, "recommendation": "Overstocked — run a promo" }
+    ]
+  },
+  "30-days": {
+    "needingAttention": 22,
+    "highDemand": 11,
+    "potentialStockouts": 9,
+    "rows": [
+      { "id": "fc-30-1", "product": "Zinger Burger Buns", "currentStock": 64, "predictedDemand": 2100, "difference": -2036, "daysUntilStockout": 1, "recommendation": "Negotiate monthly contract" },
+      { "id": "fc-30-2", "product": "Chicken Fillet 1kg", "currentStock": 12, "predictedDemand": 880, "difference": -868, "daysUntilStockout": 1, "recommendation": "Lock a monthly rate with Shaheen Poultry" },
+      { "id": "fc-30-3", "product": "Coke 500ml", "currentStock": 96, "predictedDemand": 1240, "difference": -1144, "daysUntilStockout": 2, "recommendation": "Bulk crate pricing available" },
+      { "id": "fc-30-4", "product": "Fresh Milk 1L", "currentStock": 18, "predictedDemand": 780, "difference": -762, "daysUntilStockout": 1, "recommendation": "Set up recurring dairy delivery" },
+      { "id": "fc-30-5", "product": "Sugar-Free Cookies", "currentStock": 29, "predictedDemand": 12, "difference": 17, "daysUntilStockout": null, "recommendation": "Reduce next order" },
+      { "id": "fc-30-6", "product": "Imported Pasta Sauce", "currentStock": 38, "predictedDemand": 9, "difference": 29, "daysUntilStockout": null, "recommendation": "Pause reordering" }
+    ]
+  }
+}

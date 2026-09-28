@@ -1,0 +1,9 @@
+[
+  { "id": "rdr-1", "name": "Muhammad Ali", "phone": "+92 300 1122334", "vehicle": "Honda CD 70", "zone": "DHA Phase 5", "activeOrders": 2, "completedToday": 11, "status": "on_delivery", "rating": "4.8" },
+  { "id": "rdr-2", "name": "Kamran Yousaf", "phone": "+92 301 5566778", "vehicle": "Suzuki GS 150", "zone": "Gulberg III", "activeOrders": 1, "completedToday": 9, "status": "on_delivery", "rating": "4.6" },
+  { "id": "rdr-3", "name": "Danish Iqbal", "phone": "+92 322 9988776", "vehicle": "Honda Pridor", "zone": "Johar Town", "activeOrders": 0, "completedToday": 14, "status": "available", "rating": "4.9" },
+  { "id": "rdr-4", "name": "Sohail Abbas", "phone": "+92 333 4455990", "vehicle": "Electric Scooter", "zone": "Model Town", "activeOrders": 0, "completedToday": 6, "status": "available", "rating": "4.4" },
+  { "id": "rdr-5", "name": "Waqar Younis", "phone": "+92 345 7766554", "vehicle": "Honda CD 70", "zone": "Bahria Town", "activeOrders": 0, "completedToday": 0, "status": "offline", "rating": "4.2" },
+  { "id": "rdr-6", "name": "Naveed Anjum", "phone": "+92 314 2233445", "vehicle": "Suzuki GD 110", "zone": "Cantt", "activeOrders": 0, "completedToday": 3, "status": "offline", "rating": "4.1" },
+  { "id": "rdr-7", "name": "Zeeshan Haider", "phone": "+92 306 8877665", "vehicle": "Loader Rickshaw", "zone": "Township", "activeOrders": 0, "completedToday": 0, "status": "inactive", "rating": null }
+]

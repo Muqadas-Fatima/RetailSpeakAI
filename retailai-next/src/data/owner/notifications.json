@@ -1,0 +1,74 @@
+[
+  {
+    "id": "on-1",
+    "category": "low-stock",
+    "title": "Bakery Bread almost out",
+    "message": "Only 4 loaves left against a threshold of 25.",
+    "createdAt": "2026-08-31T12:35:00Z",
+    "read": false,
+    "href": "/owner/inventory"
+  },
+  {
+    "id": "on-2",
+    "category": "purchase-order",
+    "title": "PO-2291 needs approval",
+    "message": "Dairy Fresh Distributors — Rs 148,600 for 12 items.",
+    "createdAt": "2026-08-31T08:12:00Z",
+    "read": false,
+    "href": "/owner/purchase-orders"
+  },
+  {
+    "id": "on-3",
+    "category": "supplier",
+    "title": "Bismillah Traders payment overdue",
+    "message": "Rs 264,300 is overdue by 4 days.",
+    "createdAt": "2026-08-31T07:00:00Z",
+    "read": false,
+    "href": "/owner/khata/kh-1"
+  },
+  {
+    "id": "on-4",
+    "category": "ai",
+    "title": "Demand spike predicted",
+    "message": "Eggs demand is trending 22% above last week.",
+    "createdAt": "2026-08-30T19:30:00Z",
+    "read": true,
+    "href": "/owner/forecast"
+  },
+  {
+    "id": "on-5",
+    "category": "purchase-order",
+    "title": "PO-2288 partially received",
+    "message": "5 of 8 items received from Al-Madina Bakers.",
+    "createdAt": "2026-08-30T06:40:00Z",
+    "read": true,
+    "href": "/owner/purchase-orders"
+  },
+  {
+    "id": "on-6",
+    "category": "low-stock",
+    "title": "Mozzarella Cheese critical",
+    "message": "6 kg remaining — reorder 40 kg suggested.",
+    "createdAt": "2026-08-29T15:20:00Z",
+    "read": true,
+    "href": "/owner/inventory"
+  },
+  {
+    "id": "on-7",
+    "category": "ai",
+    "title": "Slow movers detected",
+    "message": "4 products sold fewer than 8 units this month.",
+    "createdAt": "2026-08-28T10:05:00Z",
+    "read": true,
+    "href": "/owner/analytics"
+  },
+  {
+    "id": "on-8",
+    "category": "supplier",
+    "title": "Al-Madina Bakers settled",
+    "message": "Rs 38,750 paid on delivery. Balance is now zero.",
+    "createdAt": "2026-08-29T07:10:00Z",
+    "read": true,
+    "href": "/owner/khata/kh-4"
+  }
+]

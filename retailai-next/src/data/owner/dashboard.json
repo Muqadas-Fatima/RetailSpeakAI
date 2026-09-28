@@ -1,0 +1,369 @@
+{
+  "kpis": [
+    {
+      "id": "revenue",
+      "label": "Today's Revenue",
+      "value": "Rs 184,250",
+      "subtitle": "+12.4% vs. yesterday",
+      "trend": "up",
+      "icon": "wallet",
+      "href": "/owner/analytics",
+      "moduleId": "analytics"
+    },
+    {
+      "id": "orders",
+      "label": "Today's Orders",
+      "value": "132",
+      "subtitle": "18 incoming right now",
+      "trend": "up",
+      "icon": "shopping-bag",
+      "href": "/owner/orders",
+      "moduleId": "orders"
+    },
+    {
+      "id": "supplier-due",
+      "label": "Supplier Due",
+      "value": "Rs 642,900",
+      "subtitle": "across 7 suppliers",
+      "trend": "down",
+      "icon": "book-open",
+      "href": "/owner/khata",
+      "moduleId": "supplier-khata"
+    },
+    {
+      "id": "low-stock",
+      "label": "Low Stock",
+      "value": "14",
+      "subtitle": "products below threshold",
+      "icon": "boxes",
+      "href": "/owner/inventory",
+      "moduleId": "inventory",
+      "tone": "warning"
+    },
+    {
+      "id": "pending-po",
+      "label": "Pending PO Approvals",
+      "value": "3",
+      "subtitle": "waiting for your approval",
+      "icon": "clipboard-check",
+      "href": "/owner/purchase-orders",
+      "moduleId": "purchase-orders",
+      "tone": "critical"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "review-po",
+      "label": "Review Purchase Orders",
+      "icon": "clipboard-check",
+      "href": "/owner/purchase-orders",
+      "moduleId": "purchase-orders",
+      "requiredAction": "approve",
+      "primary": true
+    },
+    {
+      "id": "add-product",
+      "label": "Add Product",
+      "icon": "package-plus",
+      "href": "/owner/products",
+      "moduleId": "products",
+      "requiredAction": "create"
+    },
+    {
+      "id": "add-supplier",
+      "label": "Add Supplier",
+      "icon": "truck",
+      "href": "/owner/suppliers",
+      "moduleId": "suppliers",
+      "requiredAction": "create"
+    },
+    {
+      "id": "low-stock",
+      "label": "View Low Stock",
+      "icon": "boxes",
+      "href": "/owner/inventory",
+      "moduleId": "inventory"
+    },
+    {
+      "id": "record-payment",
+      "label": "Record Supplier Payment",
+      "icon": "credit-card",
+      "href": "/owner/khata",
+      "moduleId": "supplier-khata",
+      "requiredAction": "record-payment"
+    }
+  ],
+  "bestSellers": [
+    { "id": "bs-1", "rank": 1, "product": "Zinger Burger", "unitsSold": 486, "revenue": "Rs 315,900" },
+    { "id": "bs-2", "rank": 2, "product": "Pepperoni Pizza (Large)", "unitsSold": 312, "revenue": "Rs 280,800" },
+    { "id": "bs-3", "rank": 3, "product": "Loaded Fries", "unitsSold": 298, "revenue": "Rs 104,300" },
+    { "id": "bs-4", "rank": 4, "product": "Coke 500ml", "unitsSold": 274, "revenue": "Rs 27,400" },
+    { "id": "bs-5", "rank": 5, "product": "Fresh Milk 1L", "unitsSold": 241, "revenue": "Rs 28,920" }
+  ],
+  "slowMovers": [
+    { "id": "sm-1", "product": "Green Olives Jar 350g", "unitsSold": 3, "currentStock": 46, "lastSold": "2026-08-19T11:20:00Z" },
+    { "id": "sm-2", "product": "Imported Pasta Sauce", "unitsSold": 5, "currentStock": 38, "lastSold": "2026-08-22T15:05:00Z" },
+    { "id": "sm-3", "product": "Diet Lemon Soda 1.5L", "unitsSold": 6, "currentStock": 52, "lastSold": "2026-08-24T09:45:00Z" },
+    { "id": "sm-4", "product": "Sugar-Free Cookies", "unitsSold": 7, "currentStock": 29, "lastSold": "2026-08-25T18:10:00Z" }
+  ],
+  "lowStock": [
+    {
+      "id": "ls-1",
+      "product": "Bakery Bread (Milk Loaf)",
+      "currentStock": 4,
+      "threshold": 25,
+      "suggestedReorder": 60,
+      "preferredSupplier": "Al-Madina Bakers",
+      "status": "critical",
+      "href": "/owner/inventory"
+    },
+    {
+      "id": "ls-2",
+      "product": "Eggs (Dozen)",
+      "currentStock": 9,
+      "threshold": 30,
+      "suggestedReorder": 72,
+      "preferredSupplier": "Shaheen Poultry Farm",
+      "status": "critical",
+      "href": "/owner/inventory"
+    },
+    {
+      "id": "ls-3",
+      "product": "Fresh Milk 1L",
+      "currentStock": 18,
+      "threshold": 40,
+      "suggestedReorder": 90,
+      "preferredSupplier": "Dairy Fresh Distributors",
+      "status": "low",
+      "href": "/owner/inventory"
+    },
+    {
+      "id": "ls-4",
+      "product": "Chicken Fillet 1kg",
+      "currentStock": 12,
+      "threshold": 25,
+      "suggestedReorder": 50,
+      "preferredSupplier": "Shaheen Poultry Farm",
+      "status": "low",
+      "href": "/owner/inventory"
+    },
+    {
+      "id": "ls-5",
+      "product": "Mozzarella Cheese 1kg",
+      "currentStock": 6,
+      "threshold": 20,
+      "suggestedReorder": 40,
+      "preferredSupplier": "Dairy Fresh Distributors",
+      "status": "low",
+      "href": "/owner/inventory"
+    }
+  ],
+  "recentOrders": [
+    {
+      "id": "ro-1",
+      "reference": "RS-78412",
+      "customer": "Ayesha Siddiqui",
+      "items": 6,
+      "total": "Rs 3,180",
+      "payment": "Card",
+      "status": "preparing",
+      "placedAt": "2026-08-31T12:42:00Z",
+      "href": "/owner/orders"
+    },
+    {
+      "id": "ro-2",
+      "reference": "RS-78411",
+      "customer": "Bilal Ahmed",
+      "items": 3,
+      "total": "Rs 1,450",
+      "payment": "Cash on Delivery",
+      "status": "dispatched",
+      "placedAt": "2026-08-31T12:20:00Z",
+      "href": "/owner/orders"
+    },
+    {
+      "id": "ro-3",
+      "reference": "RS-78410",
+      "customer": "Hina Tariq",
+      "items": 11,
+      "total": "Rs 7,620",
+      "payment": "JazzCash",
+      "status": "new",
+      "placedAt": "2026-08-31T12:04:00Z",
+      "href": "/owner/orders"
+    },
+    {
+      "id": "ro-4",
+      "reference": "RS-78409",
+      "customer": "Usman Raza",
+      "items": 2,
+      "total": "Rs 890",
+      "payment": "Easypaisa",
+      "status": "delivered",
+      "placedAt": "2026-08-31T11:36:00Z",
+      "href": "/owner/orders"
+    },
+    {
+      "id": "ro-5",
+      "reference": "RS-78408",
+      "customer": "Fatima Noor",
+      "items": 8,
+      "total": "Rs 4,270",
+      "payment": "Card",
+      "status": "ready",
+      "placedAt": "2026-08-31T11:12:00Z",
+      "href": "/owner/orders"
+    }
+  ],
+  "voice": {
+    "totalVoiceOrders": "1,248",
+    "voiceShare": 38,
+    "textShare": 62,
+    "languages": [
+      { "label": "Urdu", "share": 54 },
+      { "label": "English", "share": 31 },
+      { "label": "Mixed (Roman Urdu)", "share": 15 }
+    ],
+    "peakHours": [
+      { "label": "12 – 2 PM", "share": 28 },
+      { "label": "6 – 8 PM", "share": 41 },
+      { "label": "9 – 11 PM", "share": 22 },
+      { "label": "Other", "share": 9 }
+    ]
+  },
+  "alerts": [
+    {
+      "id": "al-1",
+      "severity": "critical",
+      "message": "Bakery Bread will run out before tomorrow's evening rush.",
+      "currentStock": 4,
+      "predictedDemand": 58,
+      "suggestedReorder": 60
+    },
+    {
+      "id": "al-2",
+      "severity": "warning",
+      "message": "Eggs demand is trending 22% above last week.",
+      "currentStock": 9,
+      "predictedDemand": 64,
+      "suggestedReorder": 72
+    },
+    {
+      "id": "al-3",
+      "severity": "info",
+      "message": "Coke 500ml sells fastest on weekends — consider a bulk order.",
+      "currentStock": 96,
+      "predictedDemand": 130,
+      "suggestedReorder": 120
+    }
+  ],
+  "purchaseOrders": [
+    {
+      "id": "po-1",
+      "reference": "PO-2291",
+      "supplier": "Dairy Fresh Distributors",
+      "itemCount": 12,
+      "total": "Rs 148,600",
+      "stage": "pending-approval",
+      "expectedAt": "2026-09-02T09:00:00Z",
+      "href": "/owner/purchase-orders"
+    },
+    {
+      "id": "po-2",
+      "reference": "PO-2290",
+      "supplier": "Shaheen Poultry Farm",
+      "itemCount": 5,
+      "total": "Rs 92,400",
+      "stage": "sent",
+      "expectedAt": "2026-09-01T07:30:00Z",
+      "href": "/owner/purchase-orders"
+    },
+    {
+      "id": "po-3",
+      "reference": "PO-2288",
+      "supplier": "Al-Madina Bakers",
+      "itemCount": 8,
+      "total": "Rs 38,750",
+      "stage": "partially-received",
+      "expectedAt": "2026-08-31T06:00:00Z",
+      "href": "/owner/purchase-orders"
+    },
+    {
+      "id": "po-4",
+      "reference": "PO-2284",
+      "supplier": "Bismillah Traders",
+      "itemCount": 21,
+      "total": "Rs 264,300",
+      "stage": "received",
+      "expectedAt": "2026-08-28T10:00:00Z",
+      "href": "/owner/purchase-orders"
+    }
+  ],
+  "supplierLedger": [
+    {
+      "id": "sl-1",
+      "supplier": "Bismillah Traders",
+      "balance": "Rs 264,300",
+      "lastPayment": "2026-08-18T00:00:00Z",
+      "dueLabel": "Overdue by 4 days",
+      "status": "overdue",
+      "href": "/owner/khata/kh-1"
+    },
+    {
+      "id": "sl-2",
+      "supplier": "Dairy Fresh Distributors",
+      "balance": "Rs 148,600",
+      "lastPayment": "2026-08-25T00:00:00Z",
+      "dueLabel": "Due in 3 days",
+      "status": "due-soon",
+      "href": "/owner/khata/kh-2"
+    },
+    {
+      "id": "sl-3",
+      "supplier": "Shaheen Poultry Farm",
+      "balance": "Rs 92,400",
+      "lastPayment": "2026-08-27T00:00:00Z",
+      "dueLabel": "Due in 6 days",
+      "status": "due-soon",
+      "href": "/owner/khata/kh-3"
+    },
+    {
+      "id": "sl-4",
+      "supplier": "Al-Madina Bakers",
+      "balance": "Rs 0",
+      "lastPayment": "2026-08-29T00:00:00Z",
+      "dueLabel": "Settled",
+      "status": "settled",
+      "href": "/owner/khata/kh-4"
+    }
+  ],
+  "receiving": [
+    {
+      "id": "rc-1",
+      "reference": "PO-2288",
+      "supplier": "Al-Madina Bakers",
+      "expectedItems": 8,
+      "receivedItems": 5,
+      "status": "partial",
+      "href": "/owner/purchase-orders"
+    },
+    {
+      "id": "rc-2",
+      "reference": "PO-2290",
+      "supplier": "Shaheen Poultry Farm",
+      "expectedItems": 5,
+      "receivedItems": 0,
+      "status": "awaiting",
+      "href": "/owner/purchase-orders"
+    },
+    {
+      "id": "rc-3",
+      "reference": "PO-2284",
+      "supplier": "Bismillah Traders",
+      "expectedItems": 21,
+      "receivedItems": 21,
+      "status": "complete",
+      "href": "/owner/purchase-orders"
+    }
+  ]
+}

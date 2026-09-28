@@ -1,0 +1,109 @@
+{
+  "prompts": [
+    {
+      "id": "sales-today",
+      "label": "Today's sales",
+      "text": "How are sales performing today?"
+    },
+    {
+      "id": "low-stock",
+      "label": "Low stock",
+      "text": "Which items need restocking this week?"
+    },
+    {
+      "id": "supplier-dues",
+      "label": "Supplier dues",
+      "text": "What supplier payments are due?"
+    },
+    {
+      "id": "top-items",
+      "label": "Top sellers",
+      "text": "What are my best selling items this month?"
+    },
+    {
+      "id": "forecast",
+      "label": "Demand forecast",
+      "text": "What should I order for next week?"
+    },
+    {
+      "id": "orders",
+      "label": "Live orders",
+      "text": "How many orders are pending right now?"
+    }
+  ],
+  "fallback": "I can help with sales, stock, supplier dues and demand forecasts. Try asking about today's sales, low stock items or supplier payments.",
+  "replies": [
+    {
+      "id": "sales",
+      "keywords": [
+        "sales",
+        "revenue",
+        "today",
+        "earning"
+      ],
+      "reply": "Today you have done Rs 184,250 across 132 orders — 12.4% above yesterday. The 6–8 PM slot is your strongest, contributing Rs 36,400."
+    },
+    {
+      "id": "low-stock",
+      "keywords": [
+        "stock",
+        "restock",
+        "low",
+        "inventory",
+        "out of stock"
+      ],
+      "reply": "14 products are below threshold. The urgent ones are Bakery Bread (4 loaves), Mozzarella Cheese (6 kg) and Eggs (9 dozen). I suggest raising a purchase order for 60 loaves, 40 kg cheese and 72 dozen eggs."
+    },
+    {
+      "id": "supplier-dues",
+      "keywords": [
+        "supplier",
+        "payment",
+        "due",
+        "khata",
+        "owe"
+      ],
+      "reply": "Rs 642,900 is outstanding across 7 suppliers. Bismillah Traders is overdue by 4 days at Rs 264,300, and Dairy Fresh Distributors has Rs 148,600 due in 3 days."
+    },
+    {
+      "id": "top-items",
+      "keywords": [
+        "best",
+        "top",
+        "selling",
+        "popular"
+      ],
+      "reply": "This month's top sellers are Zinger Burger (486 units, Rs 315,900), Pepperoni Pizza Large (312 units) and Loaded Fries (298 units). Zinger alone is 17% of food revenue."
+    },
+    {
+      "id": "forecast",
+      "keywords": [
+        "forecast",
+        "order",
+        "next week",
+        "predict",
+        "demand"
+      ],
+      "reply": "For the next 7 days I project shortfalls on Zinger Burger Buns (need ~500), Chicken Fillet (~205 kg) and Coke 500ml (~24 crates). Green Olives are overstocked — consider a promotion instead of reordering."
+    },
+    {
+      "id": "orders",
+      "keywords": [
+        "order",
+        "pending",
+        "delivery",
+        "rider"
+      ],
+      "reply": "You have 18 live orders: 3 new, 6 preparing, 4 ready and 5 dispatched. Danish Iqbal is free right now and has completed 14 deliveries today."
+    },
+    {
+      "id": "voice",
+      "keywords": [
+        "voice",
+        "language",
+        "urdu"
+      ],
+      "reply": "Voice ordering handled 1,248 orders (38% of all orders). Urdu leads at 54%, followed by English at 31%. Peak voice usage is 6–8 PM."
+    }
+  ]
+}

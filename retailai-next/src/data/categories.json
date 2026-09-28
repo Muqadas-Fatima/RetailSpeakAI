@@ -1,0 +1,9 @@
+[
+  { "id": "grocery", "name": "Grocery", "image": "cat-groceries" },
+  { "id": "fastfood", "name": "Fast Food", "image": "food-zinger" },
+  { "id": "pizza", "name": "Pizza", "image": "food-pizza" },
+  { "id": "drinks", "name": "Drinks", "image": "cat-beverages" },
+  { "id": "snacks", "name": "Snacks", "image": "cat-snacks" },
+  { "id": "desserts", "name": "Desserts", "image": "food-dessert" },
+  { "id": "dairy", "name": "Dairy", "image": "cat-dairy" }
+]

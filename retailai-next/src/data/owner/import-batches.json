@@ -1,0 +1,8 @@
+[
+  { "id": "imp-1", "fileName": "products-august-refresh.csv", "entity": "products", "rowCount": 184, "status": "completed", "uploadedAt": "2026-08-31T07:42:00Z", "message": "184 products updated, 0 skipped" },
+  { "id": "imp-2", "fileName": "inventory-count-30aug.csv", "entity": "inventory", "rowCount": 212, "status": "completed", "uploadedAt": "2026-08-30T18:05:00Z", "message": "Stock levels synced from physical count" },
+  { "id": "imp-3", "fileName": "suppliers-contacts.csv", "entity": "suppliers", "rowCount": 12, "status": "partial", "uploadedAt": "2026-08-29T11:20:00Z", "message": "10 imported, 2 rows missing phone number" },
+  { "id": "imp-4", "fileName": "po-backlog-q3.csv", "entity": "purchase-orders", "rowCount": 46, "status": "failed", "uploadedAt": "2026-08-28T09:35:00Z", "message": "Column 'expected_at' has an invalid date format" },
+  { "id": "imp-5", "fileName": "products-price-revision.csv", "entity": "products", "rowCount": 97, "status": "completed", "uploadedAt": "2026-08-26T15:10:00Z", "message": "97 prices revised" },
+  { "id": "imp-6", "fileName": "inventory-frozen-section.csv", "entity": "inventory", "rowCount": 38, "status": "processing", "uploadedAt": "2026-08-31T12:50:00Z", "message": "Validating rows" }
+]

@@ -1,0 +1,192 @@
+[
+  {
+    "id": "zinger",
+    "name": "Zinger Burger",
+    "description": "Crispy chicken fillet, lettuce, mayo",
+    "ingredients": "Chicken fillet, brioche bun, iceberg lettuce, signature mayo",
+    "price": 650,
+    "rating": 4.7,
+    "reviews": 126,
+    "image": "food-zinger",
+    "tab": "burgers",
+    "available": true,
+    "categoryId": "fastfood",
+    "keywords": [
+      "zinger",
+      "burger",
+      "chicken",
+      "crispy",
+      "spicy burger"
+    ]
+  },
+  {
+    "id": "cheeseburger",
+    "name": "Chicken Cheese Burger",
+    "description": "Juicy chicken with melted cheese",
+    "ingredients": "Chicken patty, cheddar cheese, sesame bun, house sauce",
+    "price": 600,
+    "rating": 4.6,
+    "reviews": 98,
+    "image": "food-cheeseburger",
+    "tab": "burgers",
+    "available": true,
+    "categoryId": "fastfood",
+    "keywords": [
+      "cheese burger",
+      "cheeseburger",
+      "chicken burger",
+      "cheese"
+    ]
+  },
+  {
+    "id": "beefburger",
+    "name": "Beef Burger",
+    "description": "Beef patty with fresh veggies",
+    "ingredients": "Beef patty, tomato, lettuce, pickles, smoky sauce",
+    "price": 700,
+    "rating": 4.6,
+    "reviews": 74,
+    "image": "food-beefburger",
+    "tab": "burgers",
+    "available": true,
+    "categoryId": "fastfood",
+    "keywords": [
+      "beef",
+      "beef burger",
+      "patty"
+    ]
+  },
+  {
+    "id": "pizza",
+    "name": "Pepperoni Pizza",
+    "description": "Loaded pepperoni and mozzarella",
+    "ingredients": "Wheat base, tomato sauce, mozzarella, pepperoni, oregano",
+    "price": 900,
+    "rating": 4.5,
+    "reviews": 210,
+    "image": "food-pizza",
+    "tab": "pizza",
+    "available": true,
+    "categoryId": "pizza",
+    "keywords": [
+      "pizza",
+      "pepperoni",
+      "cheese pizza"
+    ]
+  },
+  {
+    "id": "fries",
+    "name": "Loaded Fries",
+    "description": "Golden fries with cheese sauce",
+    "ingredients": "Potato fries, cheese sauce, herbs, chilli flakes",
+    "price": 350,
+    "rating": 4.6,
+    "reviews": 64,
+    "image": "food-fries",
+    "tab": "fries",
+    "available": true,
+    "categoryId": "snacks",
+    "keywords": [
+      "fries",
+      "chips",
+      "loaded fries",
+      "french fries"
+    ]
+  },
+  {
+    "id": "cola",
+    "name": "Coke",
+    "description": "Chilled 500ml bottle",
+    "ingredients": "Carbonated water, sugar, caramel colour",
+    "price": 100,
+    "rating": 4.5,
+    "reviews": 302,
+    "image": "item-cola",
+    "tab": "drinks",
+    "available": true,
+    "categoryId": "drinks",
+    "keywords": [
+      "coke",
+      "cola",
+      "drink",
+      "soda",
+      "pepsi",
+      "cold drink"
+    ]
+  },
+  {
+    "id": "brownie",
+    "name": "Chocolate Brownie",
+    "description": "Warm fudge brownie slice",
+    "ingredients": "Dark chocolate, butter, cocoa, walnuts",
+    "price": 280,
+    "rating": 4.8,
+    "reviews": 51,
+    "image": "food-dessert",
+    "tab": "deals",
+    "available": true,
+    "categoryId": "desserts",
+    "keywords": [
+      "brownie",
+      "dessert",
+      "chocolate",
+      "sweet",
+      "mithai"
+    ]
+  },
+  {
+    "id": "milk",
+    "name": "Fresh Milk 1L",
+    "description": "Full cream dairy milk",
+    "ingredients": "Pasteurised full cream milk",
+    "price": 120,
+    "rating": 4.4,
+    "reviews": 88,
+    "image": "item-milk",
+    "tab": "deals",
+    "available": true,
+    "categoryId": "dairy",
+    "keywords": [
+      "milk",
+      "doodh",
+      "dairy"
+    ]
+  },
+  {
+    "id": "bread",
+    "name": "Bakery Bread",
+    "description": "Soft milk bread loaf",
+    "ingredients": "Wheat flour, milk, yeast, sugar",
+    "price": 70,
+    "rating": 4.3,
+    "reviews": 40,
+    "image": "item-bread",
+    "tab": "deals",
+    "available": false,
+    "categoryId": "grocery",
+    "keywords": [
+      "bread",
+      "double roti",
+      "roti",
+      "bakery"
+    ]
+  },
+  {
+    "id": "eggs",
+    "name": "Eggs (Dozen)",
+    "description": "Farm fresh brown eggs",
+    "ingredients": "Farm eggs",
+    "price": 350,
+    "rating": 4.5,
+    "reviews": 132,
+    "image": "item-eggs",
+    "tab": "deals",
+    "available": true,
+    "categoryId": "dairy",
+    "keywords": [
+      "eggs",
+      "egg",
+      "anday"
+    ]
+  }
+]

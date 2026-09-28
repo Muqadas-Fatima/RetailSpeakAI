@@ -1,0 +1,125 @@
+{
+  "filters": [
+    {
+      "id": "all",
+      "label": "All"
+    },
+    {
+      "id": "orders",
+      "label": "Orders"
+    },
+    {
+      "id": "payments",
+      "label": "Payments"
+    },
+    {
+      "id": "khata",
+      "label": "Khata"
+    },
+    {
+      "id": "promotions",
+      "label": "Promotions"
+    }
+  ],
+  "items": [
+    {
+      "id": "n1",
+      "kind": "orders",
+      "title": "Order shipped",
+      "message": "Your order #RS-78412 has been shipped and is on the way.",
+      "detail": "Rider Muhammad Ali is carrying 6 items. Estimated arrival in 25 minutes.",
+      "hoursAgo": 1,
+      "read": false,
+      "link": "/track"
+    },
+    {
+      "id": "n2",
+      "kind": "promotions",
+      "title": "Weekend sale: up to 30% off",
+      "message": "Exclusive offers on top brands. Hurry, ends tonight!",
+      "detail": "Applies to beverages, snacks and dairy. No code needed at checkout.",
+      "hoursAgo": 3,
+      "read": false,
+      "link": "/menu"
+    },
+    {
+      "id": "n3",
+      "kind": "payments",
+      "title": "Payment received",
+      "message": "Rs 3,180 paid via card for order #RS-78412.",
+      "detail": "Transaction ID TXN-9F2K10. A receipt was emailed to you.",
+      "hoursAgo": 5,
+      "read": true,
+      "link": "/orders"
+    },
+    {
+      "id": "n4",
+      "kind": "khata",
+      "title": "Khata balance updated",
+      "message": "Rs 1,800 added to your running balance at Al-Madina Store.",
+      "detail": "Outstanding balance is now Rs 6,300. Due on the 5th.",
+      "hoursAgo": 27,
+      "read": false,
+      "link": "/profile"
+    },
+    {
+      "id": "n5",
+      "kind": "orders",
+      "title": "Order delivered",
+      "message": "Order #RS-78398 was delivered. Rate your experience.",
+      "detail": "14 items delivered by Muhammad Ali in 32 minutes.",
+      "hoursAgo": 30,
+      "read": true,
+      "link": "/orders"
+    },
+    {
+      "id": "n6",
+      "kind": "promotions",
+      "title": "New AI recommendation",
+      "message": "We found 6 new products you might love based on your orders.",
+      "detail": "Tap to open your personalised picks in the storefront.",
+      "hoursAgo": 34,
+      "read": true,
+      "link": "/menu"
+    },
+    {
+      "id": "n7",
+      "kind": "payments",
+      "title": "Price drop on a saved item",
+      "message": "Loaded Fries dropped from Rs 400 to Rs 350.",
+      "hoursAgo": 74,
+      "read": true,
+      "link": "/menu"
+    },
+    {
+      "id": "n8",
+      "kind": "khata",
+      "title": "Khata payment cleared",
+      "message": "Your Rs 3,000 payment to Bismillah Traders was recorded.",
+      "detail": "Receipt KH-2291 is available in your khata history.",
+      "hoursAgo": 96,
+      "read": true,
+      "link": "/profile"
+    },
+    {
+      "id": "n9",
+      "kind": "system",
+      "title": "New device signed in",
+      "message": "A sign-in was detected on Chrome, Lahore.",
+      "detail": "If this wasn't you, change your password from Profile \u2192 Security.",
+      "hoursAgo": 120,
+      "read": true,
+      "link": "/profile"
+    },
+    {
+      "id": "n10",
+      "kind": "orders",
+      "title": "Order cancelled",
+      "message": "Order #RS-78399 was cancelled and refunded.",
+      "detail": "Rs 740 will reflect in your account within 3 working days.",
+      "hoursAgo": 146,
+      "read": true,
+      "link": "/orders"
+    }
+  ]
+}

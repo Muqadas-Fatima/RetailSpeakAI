@@ -1,0 +1,258 @@
+{
+  "categories": [
+    {
+      "value": "Bakery",
+      "label": "Bakery"
+    },
+    {
+      "value": "Beverages",
+      "label": "Beverages"
+    },
+    {
+      "value": "Dairy",
+      "label": "Dairy"
+    },
+    {
+      "value": "Fast Food",
+      "label": "Fast Food"
+    },
+    {
+      "value": "Frozen",
+      "label": "Frozen"
+    },
+    {
+      "value": "Grocery",
+      "label": "Grocery"
+    },
+    {
+      "value": "Poultry",
+      "label": "Poultry"
+    },
+    {
+      "value": "Snacks",
+      "label": "Snacks"
+    }
+  ],
+  "rows": [
+    {
+      "id": "prd-1001",
+      "name": "Zinger Burger",
+      "sku": "FF-ZNG-001",
+      "category": "Fast Food",
+      "price": "Rs 650",
+      "stock": 84,
+      "unit": "pcs",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1002",
+      "name": "Chicken Cheese Burger",
+      "sku": "FF-CCB-002",
+      "category": "Fast Food",
+      "price": "Rs 600",
+      "stock": 61,
+      "unit": "pcs",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1003",
+      "name": "Beef Burger",
+      "sku": "FF-BFB-003",
+      "category": "Fast Food",
+      "price": "Rs 700",
+      "stock": 38,
+      "unit": "pcs",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1004",
+      "name": "Pepperoni Pizza (Large)",
+      "sku": "FF-PPZ-004",
+      "category": "Fast Food",
+      "price": "Rs 900",
+      "stock": 27,
+      "unit": "pcs",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1005",
+      "name": "Loaded Fries",
+      "sku": "SN-LFR-005",
+      "category": "Snacks",
+      "price": "Rs 350",
+      "stock": 112,
+      "unit": "pcs",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1006",
+      "name": "Coke 500ml",
+      "sku": "BV-COK-006",
+      "category": "Beverages",
+      "price": "Rs 100",
+      "stock": 96,
+      "unit": "bottle",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1007",
+      "name": "Diet Lemon Soda 1.5L",
+      "sku": "BV-DLS-007",
+      "category": "Beverages",
+      "price": "Rs 220",
+      "stock": 52,
+      "unit": "bottle",
+      "status": "inactive",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1008",
+      "name": "Fresh Milk 1L",
+      "sku": "DY-MLK-008",
+      "category": "Dairy",
+      "price": "Rs 120",
+      "stock": 18,
+      "unit": "litre",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1009",
+      "name": "Mozzarella Cheese 1kg",
+      "sku": "DY-MOZ-009",
+      "category": "Dairy",
+      "price": "Rs 1,850",
+      "stock": 6,
+      "unit": "kg",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1010",
+      "name": "Eggs (Dozen)",
+      "sku": "PL-EGG-010",
+      "category": "Poultry",
+      "price": "Rs 350",
+      "stock": 9,
+      "unit": "dozen",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1011",
+      "name": "Chicken Fillet 1kg",
+      "sku": "PL-CHF-011",
+      "category": "Poultry",
+      "price": "Rs 1,150",
+      "stock": 12,
+      "unit": "kg",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1012",
+      "name": "Bakery Bread (Milk Loaf)",
+      "sku": "BK-BRD-012",
+      "category": "Bakery",
+      "price": "Rs 70",
+      "stock": 4,
+      "unit": "loaf",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1013",
+      "name": "Zinger Burger Buns (6 pcs)",
+      "sku": "BK-BUN-013",
+      "category": "Bakery",
+      "price": "Rs 180",
+      "stock": 64,
+      "unit": "pack",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1014",
+      "name": "Chocolate Brownie",
+      "sku": "BK-BRW-014",
+      "category": "Bakery",
+      "price": "Rs 280",
+      "stock": 33,
+      "unit": "pcs",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1015",
+      "name": "Loaded Fries (Frozen 2.5kg)",
+      "sku": "FZ-LFR-015",
+      "category": "Frozen",
+      "price": "Rs 1,420",
+      "stock": 41,
+      "unit": "pack",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1016",
+      "name": "Green Olives Jar 350g",
+      "sku": "GR-OLV-016",
+      "category": "Grocery",
+      "price": "Rs 620",
+      "stock": 46,
+      "unit": "jar",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1017",
+      "name": "Imported Pasta Sauce",
+      "sku": "GR-PST-017",
+      "category": "Grocery",
+      "price": "Rs 780",
+      "stock": 38,
+      "unit": "jar",
+      "status": "inactive",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1018",
+      "name": "Sugar-Free Cookies",
+      "sku": "SN-SFC-018",
+      "category": "Snacks",
+      "price": "Rs 340",
+      "stock": 29,
+      "unit": "pack",
+      "status": "active",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1019",
+      "name": "Basmati Rice 5kg",
+      "sku": "GR-RCE-019",
+      "category": "Grocery",
+      "price": "Rs 2,650",
+      "stock": 0,
+      "unit": "bag",
+      "status": "out_of_stock",
+      "imageUrl": null
+    },
+    {
+      "id": "prd-1020",
+      "name": "Cooking Oil 5L",
+      "sku": "GR-OIL-020",
+      "category": "Grocery",
+      "price": "Rs 3,180",
+      "stock": 22,
+      "unit": "can",
+      "status": "active",
+      "imageUrl": null
+    }
+  ]
+}

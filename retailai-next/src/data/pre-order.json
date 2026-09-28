@@ -1,0 +1,69 @@
+{
+  "orderIdPrefix": "SCH-",
+  "maxDaysAhead": 30,
+  "timeSlots": [
+    { "id": "09-00", "label": "09:00 AM" },
+    { "id": "11-00", "label": "11:00 AM" },
+    { "id": "13-00", "label": "01:00 PM" },
+    { "id": "15-00", "label": "03:00 PM" },
+    { "id": "17-00", "label": "05:00 PM" },
+    { "id": "19-00", "label": "07:00 PM" },
+    { "id": "21-00", "label": "09:00 PM" }
+  ],
+  "windows": [
+    { "id": "w-30", "label": "Within 30 minutes of the slot" },
+    { "id": "w-60", "label": "1 hour window" },
+    { "id": "w-120", "label": "2 hour window" }
+  ],
+  "notesPlaceholder": "Ring the bell twice, leave at reception…",
+  "tabs": [
+    { "id": "upcoming", "label": "Upcoming", "status": "upcoming" },
+    { "id": "completed", "label": "Completed", "status": "completed" },
+    { "id": "cancelled", "label": "Cancelled", "status": "cancelled" }
+  ],
+  "statusLabels": {
+    "upcoming": "Scheduled",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "demoOrders": [
+    {
+      "id": "SCH-20481",
+      "date": "2026-12-24",
+      "timeSlotId": "11-00",
+      "windowId": "w-60",
+      "notes": "Christmas eve stock-up — call before arriving.",
+      "address": "House 42, Street 7, DHA Phase 5, Lahore",
+      "items": [
+        { "name": "Fresh Milk 1L", "qty": 2 },
+        { "name": "Brown Bread", "qty": 1 }
+      ],
+      "productIds": ["milk", "milk", "bread"],
+      "total": 1240,
+      "status": "upcoming"
+    },
+    {
+      "id": "SCH-20455",
+      "date": "2026-07-14",
+      "timeSlotId": "19-00",
+      "windowId": "w-30",
+      "address": "House 42, Street 7, DHA Phase 5, Lahore",
+      "items": [{ "name": "Cola 1.5L", "qty": 3 }],
+      "productIds": ["cola", "cola", "cola"],
+      "total": 870,
+      "status": "completed"
+    },
+    {
+      "id": "SCH-20432",
+      "date": "2026-06-02",
+      "timeSlotId": "13-00",
+      "windowId": "w-120",
+      "notes": "Cancelled — travelling.",
+      "address": "House 42, Street 7, DHA Phase 5, Lahore",
+      "items": [{ "name": "Brown Bread", "qty": 2 }],
+      "productIds": ["bread", "bread"],
+      "total": 460,
+      "status": "cancelled"
+    }
+  ]
+}

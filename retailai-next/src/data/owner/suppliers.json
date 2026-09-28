@@ -1,0 +1,10 @@
+[
+  { "id": "sup-1", "name": "Bismillah Traders", "contactName": "Rafiq Bhatti", "phone": "+92 301 4455661", "category": "Grocery", "paymentTerms": "Net 15", "outstanding": "Rs 264,300", "status": "active" },
+  { "id": "sup-2", "name": "Dairy Fresh Distributors", "contactName": "Saima Yousaf", "phone": "+92 302 8899043", "category": "Dairy", "paymentTerms": "Net 7", "outstanding": "Rs 148,600", "status": "active" },
+  { "id": "sup-3", "name": "Shaheen Poultry Farm", "contactName": "Asad Shaheen", "phone": "+92 300 7712398", "category": "Poultry", "paymentTerms": "Net 10", "outstanding": "Rs 92,400", "status": "active" },
+  { "id": "sup-4", "name": "Al-Madina Bakers", "contactName": "Kashif Mehmood", "phone": "+92 321 6654410", "category": "Bakery", "paymentTerms": "Cash on Delivery", "outstanding": "Rs 0", "status": "active" },
+  { "id": "sup-5", "name": "Metro Beverage Supply", "contactName": "Nadia Aslam", "phone": "+92 333 2298745", "category": "Beverages", "paymentTerms": "Net 30", "outstanding": "Rs 74,850", "status": "active" },
+  { "id": "sup-6", "name": "Frozen Foods Pakistan", "contactName": "Junaid Alvi", "phone": "+92 345 1120987", "category": "Frozen", "paymentTerms": "Net 15", "outstanding": "Rs 41,200", "status": "active" },
+  { "id": "sup-7", "name": "Punjab Rice Mills", "contactName": "Ghulam Abbas", "phone": "+92 306 5567123", "category": "Grocery", "paymentTerms": "Net 30", "outstanding": "Rs 21,550", "status": "inactive" },
+  { "id": "sup-8", "name": "Sunrise Packaging", "contactName": "Ali Zaman", "phone": "+92 314 9987456", "category": "Packaging", "paymentTerms": "Net 15", "outstanding": "Rs 0", "status": "inactive" }
+]

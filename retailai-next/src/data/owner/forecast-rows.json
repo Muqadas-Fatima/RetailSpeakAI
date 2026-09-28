@@ -1,0 +1,14 @@
+[
+  { "id": "fr-1", "productName": "Bakery Bread (Milk Loaf)", "category": "Bakery", "currentStock": 4, "predictedDemand": 58, "suggestedReorder": 60, "confidence": "94%", "riskStatus": "critical" },
+  { "id": "fr-2", "productName": "Eggs (Dozen)", "category": "Poultry", "currentStock": 9, "predictedDemand": 32, "suggestedReorder": 72, "confidence": "91%", "riskStatus": "critical" },
+  { "id": "fr-3", "productName": "Mozzarella Cheese 1kg", "category": "Dairy", "currentStock": 6, "predictedDemand": 34, "suggestedReorder": 40, "confidence": "88%", "riskStatus": "critical" },
+  { "id": "fr-4", "productName": "Chicken Fillet 1kg", "category": "Poultry", "currentStock": 12, "predictedDemand": 88, "suggestedReorder": 80, "confidence": "92%", "riskStatus": "critical" },
+  { "id": "fr-5", "productName": "Fresh Milk 1L", "category": "Dairy", "currentStock": 18, "predictedDemand": 26, "suggestedReorder": 90, "confidence": "89%", "riskStatus": "low" },
+  { "id": "fr-6", "productName": "Zinger Burger Buns (6 pcs)", "category": "Bakery", "currentStock": 64, "predictedDemand": 70, "suggestedReorder": 60, "confidence": "86%", "riskStatus": "low" },
+  { "id": "fr-7", "productName": "Cooking Oil 5L", "category": "Grocery", "currentStock": 22, "predictedDemand": 28, "suggestedReorder": 30, "confidence": "83%", "riskStatus": "low" },
+  { "id": "fr-8", "productName": "Loaded Fries (Frozen 2.5kg)", "category": "Frozen", "currentStock": 41, "predictedDemand": 52, "suggestedReorder": 20, "confidence": "81%", "riskStatus": "low" },
+  { "id": "fr-9", "productName": "Coke 500ml", "category": "Beverages", "currentStock": 96, "predictedDemand": 44, "suggestedReorder": 0, "confidence": "95%", "riskStatus": "in_stock" },
+  { "id": "fr-10", "productName": "Zinger Burger", "category": "Fast Food", "currentStock": 84, "predictedDemand": 62, "suggestedReorder": 0, "confidence": "93%", "riskStatus": "in_stock" },
+  { "id": "fr-11", "productName": "Loaded Fries", "category": "Snacks", "currentStock": 112, "predictedDemand": 74, "suggestedReorder": 0, "confidence": "90%", "riskStatus": "in_stock" },
+  { "id": "fr-12", "productName": "Green Olives Jar 350g", "category": "Grocery", "currentStock": 46, "predictedDemand": 7, "suggestedReorder": 0, "confidence": "78%", "riskStatus": "in_stock" }
+]

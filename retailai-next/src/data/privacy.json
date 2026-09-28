@@ -1,0 +1,77 @@
+{
+  "hero": {
+    "eyebrow": "Privacy Policy",
+    "title": "Your data, on your terms.",
+    "body": "This policy explains in plain language what RetailAI collects, why we collect it, and the controls you have. No legal maze, no hidden clauses.",
+    "updated": "Last updated 1 September 2026",
+    "readTime": "3 min read"
+  },
+  "principles": [
+    {
+      "id": "minimal",
+      "icon": "database",
+      "title": "Minimal by default",
+      "body": "We only ask for what an order actually needs — nothing collected \"just in case\"."
+    },
+    {
+      "id": "encrypted",
+      "icon": "lock",
+      "title": "Encrypted in transit",
+      "body": "Voice orders, chats and payment details are encrypted end to end."
+    },
+    {
+      "id": "never-sold",
+      "icon": "shield-check",
+      "title": "Never sold",
+      "body": "Your personal data is never sold, rented or used for ad profiling."
+    },
+    {
+      "id": "revocable",
+      "icon": "key-round",
+      "title": "Always revocable",
+      "body": "Export or delete your data whenever you want, straight from your profile."
+    }
+  ],
+  "sections": [
+    {
+      "id": "collect",
+      "title": "Information we collect",
+      "body": "Your name, contact details, delivery addresses and order history — only what is required to fulfil orders and improve your experience.",
+      "points": ["Account details", "Delivery addresses", "Order & payment history", "Voice/chat order transcripts"]
+    },
+    {
+      "id": "use",
+      "title": "How we use it",
+      "body": "To place and deliver orders, power live tracking, personalise suggestions and prevent fraud. We never build advertising profiles.",
+      "points": ["Order fulfilment", "Live tracking", "Fraud prevention", "Personalised suggestions"]
+    },
+    {
+      "id": "share",
+      "title": "Who can see it",
+      "body": "Only the business fulfilling your order and our payment partners, limited to the fields they need. Staff access is role-based and logged.",
+      "points": ["Fulfilling business", "Payment processor", "Assigned rider (address only)"]
+    },
+    {
+      "id": "retain",
+      "title": "How long we keep it",
+      "body": "We retain data only as long as needed to provide the service and satisfy legal obligations, then delete or anonymise it.",
+      "points": ["Active account data", "Invoices kept for tax periods", "Transcripts trimmed regularly"]
+    }
+  ],
+  "rights": {
+    "title": "Your controls",
+    "body": "Every right below is available from your RetailAI profile — no support ticket required.",
+    "items": [
+      { "id": "access", "label": "See your data", "detail": "Review the profile, addresses and order history we hold." },
+      { "id": "correct", "label": "Correct it", "detail": "Update your name, email, phone or addresses at any time." },
+      { "id": "export", "label": "Export it", "detail": "Request a machine-readable copy of your account data." },
+      { "id": "delete", "label": "Delete it", "detail": "Close your account and erase your personal information." }
+    ]
+  },
+  "contact": {
+    "title": "Questions about your privacy?",
+    "body": "Our privacy team responds within two business days.",
+    "email": "privacy@retailai.app",
+    "cta": "Email the privacy team"
+  }
+}

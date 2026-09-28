@@ -1,0 +1,19 @@
+{
+  "editTitle": "Personal Information",
+  "editFields": [
+    { "id": "fullName", "label": "Full Name", "type": "text", "placeholder": "Your full name" },
+    { "id": "email", "label": "Email", "type": "email", "placeholder": "you@example.com" },
+    { "id": "phone", "label": "Phone Number", "type": "tel", "placeholder": "+92 300 1234567" },
+    {
+      "id": "address",
+      "label": "Delivery Address",
+      "type": "textarea",
+      "placeholder": "House, street, area, city"
+    }
+  ],
+  "languageTitle": "Language",
+  "languageOptions": [
+    { "id": "en", "label": "English" },
+    { "id": "ur", "label": "اردو" }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "fallbackUser": {
+    "fullName": "Ayna",
+    "phone": "+92 300 1234567",
+    "email": "ayna@example.com"
+  },
+  "editAction": { "label": "Edit Profile", "to": "/profile" },
+  "logout": { "label": "Logout", "to": "/welcome" },
+  "sections": [
+    {
+      "id": "account",
+      "title": "Account",
+      "rows": [
+        { "id": "personal", "label": "Edit Profile", "icon": "user" },
+        { "id": "addresses", "label": "Saved Addresses", "icon": "map-pin" }
+
+      ]
+    },
+    {
+      "id": "preferences",
+      "title": "Preferences",
+      "rows": [
+        { "id": "language", "label": "Language", "icon": "globe", "valueKey": "language" },
+        { "id": "notifications", "label": "Notifications", "icon": "bell", "to": "/notifications" }
+      ]
+    },
+    {
+      "id": "support",
+      "title": "Support",
+      "rows": [
+        { "id": "help", "label": "Help & Support", "icon": "help-circle", "to": "/help" },
+        { "id": "privacy-policy", "label": "Privacy Policy", "icon": "file-text", "to": "/privacy-policy" },
+        { "id": "terms", "label": "Terms & Conditions", "icon": "scroll" },
+        { "id": "about", "label": "About RetailAI", "icon": "info", "to": "/about" }
+      ]
+    },
+    {
+      "id": "other",
+      "title": "Other",
+      "rows": [
+        { "id": "rate", "label": "Rate App", "icon": "star" },
+        { "id": "logout", "label": "Logout", "icon": "log-out" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "store": {
+    "storeName": "RetailAI Mart — DHA Phase 5",
+    "businessType": "Grocery Store",
+    "contactPhone": "+92 42 3589 4410",
+    "contactEmail": "support@retailaimart.pk",
+    "address": "Shop 12, Commercial Broadway, DHA Phase 5, Lahore",
+    "currencyCode": "PKR",
+    "timeZone": "Asia/Karachi"
+  },
+  "inventory": {
+    "lowStockThreshold": "25",
+    "criticalStockThreshold": "10",
+    "lowStockAlertsEnabled": true,
+    "allowNegativeStock": false,
+    "defaultReorderQuantity": "50"
+  },
+  "notifications": {
+    "lowStockAlerts": true,
+    "purchaseOrderUpdates": true,
+    "supplierPaymentReminders": true,
+    "aiInsights": true,
+    "emailChannel": true,
+    "pushChannel": false
+  },
+  "account": {
+    "language": "en",
+    "theme": "light",
+    "twoFactorEnabled": true
+  }
+}

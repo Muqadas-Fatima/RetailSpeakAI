@@ -1,0 +1,242 @@
+{
+  "currency": {
+    "code": "PKR",
+    "symbol": "Rs.",
+    "locale": "en-US"
+  },
+  "pricing": {
+    "deliveryFee": 100,
+    "discount": 200,
+    "discountThreshold": 1000
+  },
+  "deliveryLocation": {
+    "label": "Delivering to:",
+    "value": "Home — DHA Phase 5, Lahore"
+  },
+  "menuTabs": [
+    {
+      "id": "burgers",
+      "label": "Burgers"
+    },
+    {
+      "id": "pizza",
+      "label": "Pizza"
+    },
+    {
+      "id": "fries",
+      "label": "Fries"
+    },
+    {
+      "id": "drinks",
+      "label": "Drinks"
+    },
+    {
+      "id": "deals",
+      "label": "Deals"
+    }
+  ],
+  "collections": [
+    {
+      "id": "recommended",
+      "title": "Recommended for you",
+      "actionLabel": "See All",
+      "productIds": [
+        "zinger",
+        "fries",
+        "cola",
+        "pizza"
+      ]
+    },
+    {
+      "id": "most-ordered",
+      "title": "Most Ordered",
+      "actionLabel": "See All",
+      "productIds": [
+        "cheeseburger",
+        "brownie",
+        "milk",
+        "eggs"
+      ]
+    },
+    {
+      "id": "cart-suggestions",
+      "title": "AI Suggestions",
+      "productIds": [
+        "cola",
+        "fries",
+        "brownie"
+      ]
+    },
+    {
+      "id": "voice-suggestions",
+      "title": "Suggested for your order",
+      "productIds": [
+        "zinger",
+        "pizza",
+        "cola"
+      ]
+    }
+  ],
+  "orderTabs": [
+    {
+      "id": "all",
+      "label": "All"
+    },
+    {
+      "id": "active",
+      "label": "Active",
+      "status": "active"
+    },
+    {
+      "id": "completed",
+      "label": "Completed",
+      "status": "delivered"
+    },
+    {
+      "id": "cancelled",
+      "label": "Cancelled",
+      "status": "cancelled"
+    }
+  ],
+  "orderStatusLabels": {
+    "active": "In Progress",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "customizationGroups": [
+    {
+      "id": "cheese",
+      "label": "Cheese",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "defaultIndex": 0
+    },
+    {
+      "id": "sauce",
+      "label": "Sauce",
+      "options": [
+        "Mayo",
+        "Spicy"
+      ],
+      "defaultIndex": 1
+    },
+    {
+      "id": "size",
+      "label": "Size",
+      "options": [
+        "Regular",
+        "Large"
+      ],
+      "defaultIndex": 0
+    },
+    {
+      "id": "spice",
+      "label": "Spice Level",
+      "options": [
+        "Mild",
+        "Medium",
+        "Hot"
+      ],
+      "defaultIndex": 1
+    }
+  ],
+  "sortOptions": [
+    {
+      "id": "popular",
+      "label": "Popular"
+    },
+    {
+      "id": "price-asc",
+      "label": "Price: Low to High"
+    },
+    {
+      "id": "price-desc",
+      "label": "Price: High to Low"
+    },
+    {
+      "id": "rating",
+      "label": "Top Rated"
+    }
+  ],
+  "productFilters": [
+    {
+      "id": "available",
+      "label": "Available only"
+    }
+  ],
+  "paymentMethods": [
+    {
+      "id": "cod",
+      "label": "Cash on Delivery",
+      "icon": "wallet",
+      "enabled": true
+    },
+    {
+      "id": "jazzcash",
+      "label": "JazzCash",
+      "icon": "phone",
+      "enabled": true
+    },
+    {
+      "id": "easypaisa",
+      "label": "Easypaisa",
+      "icon": "phone",
+      "enabled": true
+    },
+    {
+      "id": "card",
+      "label": "Debit / Credit Card",
+      "icon": "card",
+      "enabled": true
+    }
+  ],
+  "checkout": {
+    "orderIdPrefix": "AO-",
+    "etaLabel": "35 – 45 min",
+    "address": {
+      "label": "Home",
+      "value": "House 123, Street 5, DHA Phase 5, Lahore"
+    },
+    "contact": {
+      "name": "Ayna",
+      "phone": "+92 300 1234567"
+    }
+  },
+  "tracking": {
+    "etaMinutes": 15,
+    "stages": [
+      {
+        "id": "placed",
+        "label": "Order Placed",
+        "afterSeconds": 0
+      },
+      {
+        "id": "preparing",
+        "label": "Preparing",
+        "afterSeconds": 12
+      },
+      {
+        "id": "ready",
+        "label": "Ready",
+        "afterSeconds": 30
+      },
+      {
+        "id": "on-the-way",
+        "label": "Out for Delivery",
+        "afterSeconds": 50
+      },
+      {
+        "id": "delivered",
+        "label": "Delivered",
+        "afterSeconds": 80
+      }
+    ],
+    "rider": {
+      "name": "Muhammad Ali",
+      "initials": "MA",
+      "rating": 4.8
+    }
+  }
+}

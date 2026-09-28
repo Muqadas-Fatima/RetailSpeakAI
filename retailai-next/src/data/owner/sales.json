@@ -1,0 +1,119 @@
+{
+  "daily": {
+    "revenue": {
+      "total": "Rs 184,250",
+      "unit": "PKR",
+      "points": [
+        { "label": "8 AM", "value": 6200 },
+        { "label": "10 AM", "value": 11400 },
+        { "label": "12 PM", "value": 24800 },
+        { "label": "2 PM", "value": 31200 },
+        { "label": "4 PM", "value": 18900 },
+        { "label": "6 PM", "value": 36400 },
+        { "label": "8 PM", "value": 41300 },
+        { "label": "10 PM", "value": 14050 }
+      ]
+    },
+    "orders": {
+      "total": "132 orders",
+      "unit": "orders",
+      "points": [
+        { "label": "8 AM", "value": 6 },
+        { "label": "10 AM", "value": 11 },
+        { "label": "12 PM", "value": 19 },
+        { "label": "2 PM", "value": 23 },
+        { "label": "4 PM", "value": 14 },
+        { "label": "6 PM", "value": 26 },
+        { "label": "8 PM", "value": 22 },
+        { "label": "10 PM", "value": 11 }
+      ]
+    },
+    "average-order": {
+      "total": "Rs 1,396",
+      "unit": "PKR",
+      "points": [
+        { "label": "8 AM", "value": 1033 },
+        { "label": "10 AM", "value": 1036 },
+        { "label": "12 PM", "value": 1305 },
+        { "label": "2 PM", "value": 1356 },
+        { "label": "4 PM", "value": 1350 },
+        { "label": "6 PM", "value": 1400 },
+        { "label": "8 PM", "value": 1877 },
+        { "label": "10 PM", "value": 1277 }
+      ]
+    }
+  },
+  "weekly": {
+    "revenue": {
+      "total": "Rs 1,214,800",
+      "unit": "PKR",
+      "points": [
+        { "label": "Mon", "value": 142300 },
+        { "label": "Tue", "value": 156900 },
+        { "label": "Wed", "value": 168400 },
+        { "label": "Thu", "value": 174200 },
+        { "label": "Fri", "value": 221600 },
+        { "label": "Sat", "value": 207150 },
+        { "label": "Sun", "value": 144250 }
+      ]
+    },
+    "orders": {
+      "total": "902 orders",
+      "unit": "orders",
+      "points": [
+        { "label": "Mon", "value": 108 },
+        { "label": "Tue", "value": 117 },
+        { "label": "Wed", "value": 126 },
+        { "label": "Thu", "value": 131 },
+        { "label": "Fri", "value": 165 },
+        { "label": "Sat", "value": 153 },
+        { "label": "Sun", "value": 102 }
+      ]
+    },
+    "average-order": {
+      "total": "Rs 1,347",
+      "unit": "PKR",
+      "points": [
+        { "label": "Mon", "value": 1317 },
+        { "label": "Tue", "value": 1341 },
+        { "label": "Wed", "value": 1336 },
+        { "label": "Thu", "value": 1329 },
+        { "label": "Fri", "value": 1343 },
+        { "label": "Sat", "value": 1354 },
+        { "label": "Sun", "value": 1414 }
+      ]
+    }
+  },
+  "monthly": {
+    "revenue": {
+      "total": "Rs 4,986,400",
+      "unit": "PKR",
+      "points": [
+        { "label": "Week 1", "value": 1128400 },
+        { "label": "Week 2", "value": 1204600 },
+        { "label": "Week 3", "value": 1438600 },
+        { "label": "Week 4", "value": 1214800 }
+      ]
+    },
+    "orders": {
+      "total": "3,684 orders",
+      "unit": "orders",
+      "points": [
+        { "label": "Week 1", "value": 846 },
+        { "label": "Week 2", "value": 908 },
+        { "label": "Week 3", "value": 1028 },
+        { "label": "Week 4", "value": 902 }
+      ]
+    },
+    "average-order": {
+      "total": "Rs 1,353",
+      "unit": "PKR",
+      "points": [
+        { "label": "Week 1", "value": 1333 },
+        { "label": "Week 2", "value": 1326 },
+        { "label": "Week 3", "value": 1399 },
+        { "label": "Week 4", "value": 1347 }
+      ]
+    }
+  }
+}

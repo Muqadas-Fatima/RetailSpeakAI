@@ -1,0 +1,62 @@
+[
+  {
+    "id": "usr-1",
+    "name": "Ayna Zafar",
+    "email": "ayna.zafar@retailai.pk",
+    "phone": "+92 300 1234567",
+    "roleId": "owner",
+    "status": "active",
+    "permissions": [],
+    "lastActiveAt": "2026-08-31T12:55:00Z"
+  },
+  {
+    "id": "usr-2",
+    "name": "Rehan Zafar",
+    "email": "rehan.zafar@retailai.pk",
+    "phone": "+92 301 7788990",
+    "roleId": "co-owner",
+    "status": "active",
+    "permissions": [],
+    "lastActiveAt": "2026-08-31T09:20:00Z"
+  },
+  {
+    "id": "usr-3",
+    "name": "Hafsa Iqbal",
+    "email": "hafsa.iqbal@retailai.pk",
+    "phone": "+92 322 4455667",
+    "roleId": "manager",
+    "status": "active",
+    "permissions": [],
+    "lastActiveAt": "2026-08-30T17:45:00Z"
+  },
+  {
+    "id": "usr-4",
+    "name": "Owais Rehman",
+    "email": "owais.rehman@retailai.pk",
+    "phone": "+92 333 1199224",
+    "roleId": "manager",
+    "status": "invited",
+    "permissions": [],
+    "lastActiveAt": null
+  },
+  {
+    "id": "usr-5",
+    "name": "Sadia Kamal",
+    "email": "sadia.kamal@retailai.pk",
+    "phone": "+92 345 6677889",
+    "roleId": "staff",
+    "status": "active",
+    "permissions": [],
+    "lastActiveAt": "2026-08-29T14:10:00Z"
+  },
+  {
+    "id": "usr-6",
+    "name": "Talha Munir",
+    "email": "talha.munir@retailai.pk",
+    "phone": "+92 314 3344556",
+    "roleId": "staff",
+    "status": "inactive",
+    "permissions": [],
+    "lastActiveAt": "2026-08-12T11:05:00Z"
+  }
+]

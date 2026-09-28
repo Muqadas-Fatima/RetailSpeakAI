@@ -1,0 +1,62 @@
+{
+  "accounts": [
+    { "id": "kh-1", "supplierName": "Bismillah Traders", "outstanding": "Rs 264,300", "lastPaymentAt": "2026-08-18T00:00:00Z", "dueAt": "2026-08-27T00:00:00Z", "status": "overdue" },
+    { "id": "kh-2", "supplierName": "Dairy Fresh Distributors", "outstanding": "Rs 148,600", "lastPaymentAt": "2026-08-25T00:00:00Z", "dueAt": "2026-09-03T00:00:00Z", "status": "due_soon" },
+    { "id": "kh-3", "supplierName": "Shaheen Poultry Farm", "outstanding": "Rs 92,400", "lastPaymentAt": "2026-08-27T00:00:00Z", "dueAt": "2026-09-06T00:00:00Z", "status": "due_soon" },
+    { "id": "kh-4", "supplierName": "Al-Madina Bakers", "outstanding": "Rs 0", "lastPaymentAt": "2026-08-29T00:00:00Z", "dueAt": null, "status": "settled" },
+    { "id": "kh-5", "supplierName": "Metro Beverage Supply", "outstanding": "Rs 74,850", "lastPaymentAt": "2026-08-20T00:00:00Z", "dueAt": "2026-09-19T00:00:00Z", "status": "due_soon" },
+    { "id": "kh-6", "supplierName": "Frozen Foods Pakistan", "outstanding": "Rs 41,200", "lastPaymentAt": "2026-08-14T00:00:00Z", "dueAt": "2026-08-29T00:00:00Z", "status": "overdue" },
+    { "id": "kh-7", "supplierName": "Punjab Rice Mills", "outstanding": "Rs 21,550", "lastPaymentAt": "2026-08-09T00:00:00Z", "dueAt": "2026-09-08T00:00:00Z", "status": "due_soon" },
+    { "id": "kh-8", "supplierName": "Sunrise Packaging", "outstanding": "Rs 0", "lastPaymentAt": "2026-08-21T00:00:00Z", "dueAt": null, "status": "settled" }
+  ],
+  "details": {
+    "kh-1": { "id": "kh-1", "supplierName": "Bismillah Traders", "phone": "+92 301 4455661", "paymentTerms": "Net 15", "creditLimit": "Rs 500,000", "outstanding": "Rs 264,300", "lastPaymentAt": "2026-08-18T00:00:00Z", "status": "overdue" },
+    "kh-2": { "id": "kh-2", "supplierName": "Dairy Fresh Distributors", "phone": "+92 302 8899043", "paymentTerms": "Net 7", "creditLimit": "Rs 300,000", "outstanding": "Rs 148,600", "lastPaymentAt": "2026-08-25T00:00:00Z", "status": "due_soon" },
+    "kh-3": { "id": "kh-3", "supplierName": "Shaheen Poultry Farm", "phone": "+92 300 7712398", "paymentTerms": "Net 10", "creditLimit": "Rs 250,000", "outstanding": "Rs 92,400", "lastPaymentAt": "2026-08-27T00:00:00Z", "status": "due_soon" },
+    "kh-4": { "id": "kh-4", "supplierName": "Al-Madina Bakers", "phone": "+92 321 6654410", "paymentTerms": "Cash on Delivery", "creditLimit": "Rs 100,000", "outstanding": "Rs 0", "lastPaymentAt": "2026-08-29T00:00:00Z", "status": "settled" },
+    "kh-5": { "id": "kh-5", "supplierName": "Metro Beverage Supply", "phone": "+92 333 2298745", "paymentTerms": "Net 30", "creditLimit": "Rs 400,000", "outstanding": "Rs 74,850", "lastPaymentAt": "2026-08-20T00:00:00Z", "status": "due_soon" },
+    "kh-6": { "id": "kh-6", "supplierName": "Frozen Foods Pakistan", "phone": "+92 345 1120987", "paymentTerms": "Net 15", "creditLimit": "Rs 200,000", "outstanding": "Rs 41,200", "lastPaymentAt": "2026-08-14T00:00:00Z", "status": "overdue" },
+    "kh-7": { "id": "kh-7", "supplierName": "Punjab Rice Mills", "phone": "+92 306 5567123", "paymentTerms": "Net 30", "creditLimit": "Rs 150,000", "outstanding": "Rs 21,550", "lastPaymentAt": "2026-08-09T00:00:00Z", "status": "due_soon" },
+    "kh-8": { "id": "kh-8", "supplierName": "Sunrise Packaging", "phone": "+92 314 9987456", "paymentTerms": "Net 15", "creditLimit": "Rs 80,000", "outstanding": "Rs 0", "lastPaymentAt": "2026-08-21T00:00:00Z", "status": "settled" }
+  },
+  "entries": {
+    "kh-1": [
+      { "id": "kh-1-e5", "occurredAt": "2026-08-26T10:12:00Z", "type": "purchase", "reference": "PO-2284", "debit": "Rs 264,300", "credit": null, "balance": "Rs 264,300", "note": "Monthly grocery restock" },
+      { "id": "kh-1-e4", "occurredAt": "2026-08-18T00:00:00Z", "type": "payment", "reference": "KH-2291", "debit": null, "credit": "Rs 180,000", "balance": "Rs 0", "note": "Bank transfer" },
+      { "id": "kh-1-e3", "occurredAt": "2026-08-12T09:30:00Z", "type": "purchase", "reference": "PO-2271", "debit": "Rs 176,400", "credit": null, "balance": "Rs 180,000", "note": "Rice, oil and pulses" },
+      { "id": "kh-1-e2", "occurredAt": "2026-08-08T00:00:00Z", "type": "adjustment", "reference": "ADJ-118", "debit": null, "credit": "Rs 3,600", "balance": "Rs 3,600", "note": "Damaged stock credit note" },
+      { "id": "kh-1-e1", "occurredAt": "2026-08-02T11:00:00Z", "type": "purchase", "reference": "PO-2260", "debit": "Rs 7,200", "credit": null, "balance": "Rs 7,200", "note": "Opening balance carried forward" }
+    ],
+    "kh-2": [
+      { "id": "kh-2-e4", "occurredAt": "2026-08-31T08:10:00Z", "type": "purchase", "reference": "PO-2291", "debit": "Rs 148,600", "credit": null, "balance": "Rs 148,600", "note": "Milk and cheese order" },
+      { "id": "kh-2-e3", "occurredAt": "2026-08-25T00:00:00Z", "type": "payment", "reference": "KH-2285", "debit": null, "credit": "Rs 121,400", "balance": "Rs 0", "note": "Cheque #440921" },
+      { "id": "kh-2-e2", "occurredAt": "2026-08-24T08:55:00Z", "type": "purchase", "reference": "PO-2283", "debit": "Rs 121,400", "credit": null, "balance": "Rs 121,400", "note": "Weekly dairy delivery" },
+      { "id": "kh-2-e1", "occurredAt": "2026-08-15T00:00:00Z", "type": "payment", "reference": "KH-2270", "debit": null, "credit": "Rs 96,200", "balance": "Rs 0", "note": "Mobile wallet" }
+    ],
+    "kh-3": [
+      { "id": "kh-3-e3", "occurredAt": "2026-08-30T15:45:00Z", "type": "purchase", "reference": "PO-2290", "debit": "Rs 92,400", "credit": null, "balance": "Rs 92,400", "note": "Chicken and eggs" },
+      { "id": "kh-3-e2", "occurredAt": "2026-08-27T00:00:00Z", "type": "payment", "reference": "KH-2288", "debit": null, "credit": "Rs 88,150", "balance": "Rs 0", "note": "Cash payment at farm" },
+      { "id": "kh-3-e1", "occurredAt": "2026-08-22T11:30:00Z", "type": "purchase", "reference": "PO-2282", "debit": "Rs 88,150", "credit": null, "balance": "Rs 88,150", "note": "Poultry restock" }
+    ],
+    "kh-4": [
+      { "id": "kh-4-e2", "occurredAt": "2026-08-29T07:05:00Z", "type": "payment", "reference": "KH-2290", "debit": null, "credit": "Rs 38,750", "balance": "Rs 0", "note": "Paid on delivery" },
+      { "id": "kh-4-e1", "occurredAt": "2026-08-29T07:00:00Z", "type": "purchase", "reference": "PO-2288", "debit": "Rs 38,750", "credit": null, "balance": "Rs 38,750", "note": "Daily bread and buns" }
+    ],
+    "kh-5": [
+      { "id": "kh-5-e2", "occurredAt": "2026-08-30T12:22:00Z", "type": "purchase", "reference": "PO-2289", "debit": "Rs 74,850", "credit": null, "balance": "Rs 74,850", "note": "Soft drinks and juices" },
+      { "id": "kh-5-e1", "occurredAt": "2026-08-20T00:00:00Z", "type": "payment", "reference": "KH-2276", "debit": null, "credit": "Rs 68,300", "balance": "Rs 0", "note": "Bank transfer" }
+    ],
+    "kh-6": [
+      { "id": "kh-6-e2", "occurredAt": "2026-08-28T14:35:00Z", "type": "purchase", "reference": "PO-2287", "debit": "Rs 41,200", "credit": null, "balance": "Rs 41,200", "note": "Frozen fries and nuggets" },
+      { "id": "kh-6-e1", "occurredAt": "2026-08-14T00:00:00Z", "type": "payment", "reference": "KH-2264", "debit": null, "credit": "Rs 36,900", "balance": "Rs 0", "note": "Cheque #440880" }
+    ],
+    "kh-7": [
+      { "id": "kh-7-e2", "occurredAt": "2026-08-28T09:18:00Z", "type": "purchase", "reference": "PO-2286", "debit": "Rs 21,550", "credit": null, "balance": "Rs 21,550", "note": "Basmati rice bags" },
+      { "id": "kh-7-e1", "occurredAt": "2026-08-09T00:00:00Z", "type": "payment", "reference": "KH-2256", "debit": null, "credit": "Rs 19,800", "balance": "Rs 0", "note": "Cash" }
+    ],
+    "kh-8": [
+      { "id": "kh-8-e2", "occurredAt": "2026-08-21T00:00:00Z", "type": "payment", "reference": "KH-2279", "debit": null, "credit": "Rs 18,900", "balance": "Rs 0", "note": "Bank transfer" },
+      { "id": "kh-8-e1", "occurredAt": "2026-08-19T10:00:00Z", "type": "purchase", "reference": "PO-2275", "debit": "Rs 18,900", "credit": null, "balance": "Rs 18,900", "note": "Carry bags and boxes" }
+    ]
+  }
+}

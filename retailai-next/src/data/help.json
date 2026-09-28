@@ -1,0 +1,67 @@
+{
+  "search": { "placeholder": "Search for articles, topics..." },
+  "navTitle": "Support Center",
+  "nav": [
+    { "id": "home", "label": "Help Home", "icon": "home" },
+    { "id": "tickets", "label": "My Tickets", "icon": "ticket" },
+    { "id": "chat", "label": "Live Chat", "icon": "message-square" },
+    { "id": "profile", "label": "My Profile", "icon": "user", "to": "/profile" }
+  ],
+  "topics": [
+    {
+      "id": "getting-started",
+      "title": "Getting Started",
+      "body": "Set up your account, place your first voice order and track it live."
+    },
+    {
+      "id": "billing",
+      "title": "Billing & Account",
+      "body": "Payments, invoices, refunds and managing your saved details."
+    },
+    {
+      "id": "technical",
+      "title": "Technical Issues",
+      "body": "Voice recognition, app performance and connection problems."
+    }
+  ],
+  "faqTitle": "Frequently Asked Questions",
+  "faqs": [
+    {
+      "id": "reset",
+      "q": "How do I reset my password?",
+      "a": "Open Sign In and tap Forgot Password. We send a reset link to your registered email address."
+    },
+    {
+      "id": "invoice",
+      "q": "Where can I view my invoice?",
+      "a": "Every completed order has an invoice in Order History. Open the order and tap the receipt to view or share it."
+    },
+    {
+      "id": "hours",
+      "q": "What are the support hours?",
+      "a": "Our team is available 9:00 AM to 11:00 PM, seven days a week. Live chat replies usually arrive within a few minutes."
+    },
+    {
+      "id": "voice",
+      "q": "Why is voice ordering not recognising my items?",
+      "a": "Check microphone permission, speak item names clearly and confirm your app language matches the language you speak."
+    },
+    {
+      "id": "schedule",
+      "q": "Can I schedule an order for later?",
+      "a": "Yes. At checkout choose Schedule Order, pick a date and time, and manage it any time from My Scheduled Orders."
+    },
+    {
+      "id": "cancel",
+      "q": "How do I cancel or change an order?",
+      "a": "Orders can be changed while they are still being prepared. Open the order from Order History and tap Cancel Order."
+    }
+  ],
+  "contactTitle": "Still need help?",
+  "contactSubtitle": "Reach the RetailAI support team directly.",
+  "contacts": [
+    { "id": "chat", "icon": "message-square", "label": "Live Chat", "value": "Average reply in 2 min" },
+    { "id": "email", "icon": "mail", "label": "Email Support", "value": "support@retailai.app" },
+    { "id": "phone", "icon": "phone", "label": "Call Us", "value": "+92 300 1234567" }
+  ]
+}

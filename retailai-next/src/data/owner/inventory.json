@@ -1,0 +1,22 @@
+[
+  { "id": "inv-1012", "productName": "Bakery Bread (Milk Loaf)", "sku": "BK-BRD-012", "category": "Bakery", "onHand": 4, "unit": "loaf", "reorderLevel": 25, "status": "critical", "updatedAt": "2026-08-31T11:05:00Z" },
+  { "id": "inv-1009", "productName": "Mozzarella Cheese 1kg", "sku": "DY-MOZ-009", "category": "Dairy", "onHand": 6, "unit": "kg", "reorderLevel": 20, "status": "critical", "updatedAt": "2026-08-31T10:40:00Z" },
+  { "id": "inv-1010", "productName": "Eggs (Dozen)", "sku": "PL-EGG-010", "category": "Poultry", "onHand": 9, "unit": "dozen", "reorderLevel": 30, "status": "critical", "updatedAt": "2026-08-31T09:15:00Z" },
+  { "id": "inv-1011", "productName": "Chicken Fillet 1kg", "sku": "PL-CHF-011", "category": "Poultry", "onHand": 12, "unit": "kg", "reorderLevel": 25, "status": "low", "updatedAt": "2026-08-31T08:50:00Z" },
+  { "id": "inv-1008", "productName": "Fresh Milk 1L", "sku": "DY-MLK-008", "category": "Dairy", "onHand": 18, "unit": "litre", "reorderLevel": 40, "status": "low", "updatedAt": "2026-08-31T08:20:00Z" },
+  { "id": "inv-1020", "productName": "Cooking Oil 5L", "sku": "GR-OIL-020", "category": "Grocery", "onHand": 22, "unit": "can", "reorderLevel": 30, "status": "low", "updatedAt": "2026-08-30T17:30:00Z" },
+  { "id": "inv-1004", "productName": "Pepperoni Pizza (Large)", "sku": "FF-PPZ-004", "category": "Fast Food", "onHand": 27, "unit": "pcs", "reorderLevel": 20, "status": "in_stock", "updatedAt": "2026-08-31T12:10:00Z" },
+  { "id": "inv-1019", "productName": "Basmati Rice 5kg", "sku": "GR-RCE-019", "category": "Grocery", "onHand": 0, "unit": "bag", "reorderLevel": 15, "status": "out_of_stock", "updatedAt": "2026-08-29T16:00:00Z" },
+  { "id": "inv-1018", "productName": "Sugar-Free Cookies", "sku": "SN-SFC-018", "category": "Snacks", "onHand": 29, "unit": "pack", "reorderLevel": 12, "status": "in_stock", "updatedAt": "2026-08-30T14:25:00Z" },
+  { "id": "inv-1003", "productName": "Beef Burger", "sku": "FF-BFB-003", "category": "Fast Food", "onHand": 38, "unit": "pcs", "reorderLevel": 25, "status": "in_stock", "updatedAt": "2026-08-31T12:00:00Z" },
+  { "id": "inv-1017", "productName": "Imported Pasta Sauce", "sku": "GR-PST-017", "category": "Grocery", "onHand": 38, "unit": "jar", "reorderLevel": 10, "status": "in_stock", "updatedAt": "2026-08-28T11:45:00Z" },
+  { "id": "inv-1015", "productName": "Loaded Fries (Frozen 2.5kg)", "sku": "FZ-LFR-015", "category": "Frozen", "onHand": 41, "unit": "pack", "reorderLevel": 20, "status": "in_stock", "updatedAt": "2026-08-31T07:55:00Z" },
+  { "id": "inv-1016", "productName": "Green Olives Jar 350g", "sku": "GR-OLV-016", "category": "Grocery", "onHand": 46, "unit": "jar", "reorderLevel": 10, "status": "in_stock", "updatedAt": "2026-08-27T13:10:00Z" },
+  { "id": "inv-1007", "productName": "Diet Lemon Soda 1.5L", "sku": "BV-DLS-007", "category": "Beverages", "onHand": 52, "unit": "bottle", "reorderLevel": 18, "status": "in_stock", "updatedAt": "2026-08-29T10:05:00Z" },
+  { "id": "inv-1002", "productName": "Chicken Cheese Burger", "sku": "FF-CCB-002", "category": "Fast Food", "onHand": 61, "unit": "pcs", "reorderLevel": 30, "status": "in_stock", "updatedAt": "2026-08-31T12:15:00Z" },
+  { "id": "inv-1013", "productName": "Zinger Burger Buns (6 pcs)", "sku": "BK-BUN-013", "category": "Bakery", "onHand": 64, "unit": "pack", "reorderLevel": 40, "status": "low", "updatedAt": "2026-08-31T06:30:00Z" },
+  { "id": "inv-1001", "productName": "Zinger Burger", "sku": "FF-ZNG-001", "category": "Fast Food", "onHand": 84, "unit": "pcs", "reorderLevel": 40, "status": "in_stock", "updatedAt": "2026-08-31T12:35:00Z" },
+  { "id": "inv-1006", "productName": "Coke 500ml", "sku": "BV-COK-006", "category": "Beverages", "onHand": 96, "unit": "bottle", "reorderLevel": 48, "status": "in_stock", "updatedAt": "2026-08-31T11:50:00Z" },
+  { "id": "inv-1005", "productName": "Loaded Fries", "sku": "SN-LFR-005", "category": "Snacks", "onHand": 112, "unit": "pcs", "reorderLevel": 50, "status": "in_stock", "updatedAt": "2026-08-31T12:30:00Z" },
+  { "id": "inv-1014", "productName": "Chocolate Brownie", "sku": "BK-BRW-014", "category": "Bakery", "onHand": 33, "unit": "pcs", "reorderLevel": 15, "status": "in_stock", "updatedAt": "2026-08-31T09:40:00Z" }
+]

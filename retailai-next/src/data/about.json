@@ -1,0 +1,64 @@
+{
+  "hero": {
+    "tagline1": "Smart Ordering.",
+    "tagline2": "Simplified for Everyone.",
+    "paragraphs": [
+      "RetailAI is an AI-powered voice ordering platform that helps you shop faster and smarter across restaurants, groceries, pharmacies and more.",
+      "Speak naturally or type your order, choose instant or scheduled delivery, track your orders in real time, and enjoy a seamless shopping experience."
+    ],
+    "chat": [
+      { "id": "user", "from": "user", "text": "I want to order Chicken Biryani and 2 Cold Coffees" },
+      { "id": "agent", "from": "agent", "text": "Sure! I've added them to your cart." }
+    ],
+    "orderLabel": "Your Order"
+  },
+  "features": {
+    "title": "Why RetailAI?",
+    "items": [
+      {
+        "id": "easy",
+        "icon": "shopping-bag",
+        "title": "Easy Ordering",
+        "body": "Order using your voice or chat in natural language."
+      },
+      {
+        "id": "schedule",
+        "icon": "calendar-days",
+        "title": "Schedule Orders",
+        "body": "Choose your preferred date and time."
+      },
+      {
+        "id": "tracking",
+        "icon": "map-pin",
+        "title": "Real-Time Tracking",
+        "body": "Track your order status from preparation to delivery."
+      },
+      {
+        "id": "secure",
+        "icon": "shield-check",
+        "title": "Secure & Reliable",
+        "body": "Your data and payments are always safe with us."
+      }
+    ]
+  },
+  "owners": {
+    "title": "For Business Owners",
+    "subtitle": "A complete management solution to run your business efficiently.",
+    "items": [
+      { "id": "analytics", "icon": "bar-chart-3", "label": "Analytics & Insights" },
+      { "id": "inventory", "icon": "package", "label": "Inventory Management" },
+      { "id": "orders", "icon": "clipboard-list", "label": "Order & Rider Management" },
+      { "id": "staff", "icon": "users", "label": "Staff & Role Management" },
+      { "id": "growth", "icon": "trending-up", "label": "Business Growth" }
+    ]
+  },
+  "trusted": {
+    "title": "Trusted by",
+    "industries": ["Restaurants", "Groceries", "Pharmacies", "Retail Stores"]
+  },
+  "version": {
+    "note": "RetailAI is constantly evolving to bring you a smarter, faster and more personalized experience.",
+    "label": "Version 1.0.0",
+    "status": "Up to date"
+  }
+}
