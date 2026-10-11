@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import "./staff-rider.css";
 
 export const metadata: Metadata = {
   title: "RetailAI — AI Voice Ordering",
