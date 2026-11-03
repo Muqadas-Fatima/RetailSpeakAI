@@ -1,0 +1,288 @@
+<!doctype html>
+<!--
+  NEW — Customer Voice Ordering interface. Not in the original Phase 4
+  scope: TDD §2.9 lists Owner Dashboard, Warehouse Staff App, and Rider
+  Client as the phase's clients. This page is the customer-facing
+  fourth surface implied by nlu-half's own pipeline (extract-mentions ->
+  rag-retrieval -> llm-grounding -> validation-gate -> confirm ->
+  POST /v1/fulfillment/orders) but that pipeline has never been exposed
+  as a single public-facing endpoint a browser can call directly —
+  each nlu-half service is an internal stage (TDD §4.2-§4.5), not a
+  customer-facing API.
+
+  What's real here: browser-native speech-to-text (Web Speech API,
+  works today with no backend) and the full confirm/submit UI flow.
+  What's a placeholder: DEMO_MATCH_CATALOG below stands in for the
+  extract-mentions -> rag-retrieval -> llm-grounding round trip. Swap
+  `runDemoMatch()` for a real call once that pipeline is fronted by a
+  public endpoint — the rest of this file (chips, qty steppers, confirm,
+  POST to orchestrator) doesn't need to change.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RetailSpeak — Order by Voice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f7f9; --panel:#ffffff; --border:#e4e9ee; --border-soft:#edf1f4;
+    --text:#131829; --text-dim:#5c6478; --text-faint:#94a0b4;
+    --cyan:#12b8ac; --cyan-dim:#12b8ac14; --gold:#f0a83a; --gold-dim:#f0a83a1a;
+    --good:#1fa876; --bad:#e2564f; --bad-dim:#e2564f14;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{ margin:0; min-height:100vh; background:
+      radial-gradient(900px 460px at 50% -8%, #e6fbf8, transparent 60%), var(--bg);
+    color:var(--text); font-family:'Inter',-apple-system,sans-serif; }
+  h1,.disp{ font-family:'Space Grotesk',sans-serif; }
+  .urdu{ font-family:'Noto Nastaliq Urdu','Inter',sans-serif; direction:rtl; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:#ffffffcc; backdrop-filter:blur(10px); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5; }
+  header .brand{ display:flex; align-items:center; gap:9px; }
+  header .mark{ width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--cyan),#0d8e85); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:13px; font-family:'Space Grotesk',sans-serif; }
+  header .brand span{ font-weight:700; font-size:14.5px; }
+  .navpill{ display:flex; gap:2px; background:#eef2f4; padding:4px; border-radius:999px; font-size:12.5px; }
+  .navpill span{ padding:6px 13px; border-radius:999px; color:var(--text-dim); }
+  .navpill span.active{ background:var(--panel); color:var(--text); font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .avatar{ width:30px; height:30px; border-radius:999px; background:linear-gradient(135deg,var(--gold),#d9862a); }
+
+  main{ max-width:520px; margin:0 auto; padding:30px 20px 60px; text-align:center; }
+
+  .orb-wrap{ position:relative; width:220px; height:220px; margin:10px auto 20px; display:flex; align-items:center; justify-content:center; }
+  .ring{ position:absolute; border-radius:50%; border:1.5px solid var(--cyan); opacity:0; }
+  .ring1{ width:100%; height:100%; animation:ripple 2.6s ease-out infinite; }
+  .ring2{ width:100%; height:100%; animation:ripple 2.6s ease-out infinite; animation-delay:.9s; }
+  .ring3{ width:100%; height:100%; animation:ripple 2.6s ease-out infinite; animation-delay:1.8s; }
+  @keyframes ripple{ 0%{ transform:scale(.55); opacity:.55; } 100%{ transform:scale(1); opacity:0; } }
+  .orb{ width:126px; height:126px; border-radius:50%; cursor:pointer; position:relative; z-index:2;
+    background:
+      radial-gradient(circle at 35% 30%, #7cf5e6, transparent 55%),
+      conic-gradient(from 0deg, #12b8ac, #f0a83a, #12b8ac);
+    box-shadow:0 18px 40px -12px #12b8ac66, inset 0 0 30px #ffffff55;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s;
+  }
+  .orb:active{ transform:scale(.96); }
+  .orb.listening{ animation:breathe 1.4s ease-in-out infinite; }
+  @keyframes breathe{ 0%,100%{ box-shadow:0 18px 40px -12px #12b8ac66, inset 0 0 30px #ffffff55; } 50%{ box-shadow:0 22px 55px -10px #12b8acaa, inset 0 0 40px #ffffffaa; } }
+  .orb svg{ width:38px; height:38px; color:#fff; filter:drop-shadow(0 1px 3px rgba(0,0,0,.25)); }
+  .orb-label{ font-size:12.5px; color:var(--text-faint); margin-top:6px; font-weight:600; letter-spacing:.02em; }
+  .orb-hint{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; margin-top:12px; color:var(--text); }
+
+  .transcript{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px 18px; margin-top:20px; text-align:right; min-height:56px; }
+  .transcript .urdu-line{ font-size:19px; line-height:1.7; }
+  .transcript .roman{ font-size:12.5px; color:var(--text-faint); margin-top:6px; text-align:left; font-style:italic; }
+  .transcript.placeholder .urdu-line{ color:var(--text-faint); font-style:normal; }
+
+  .section-label{ text-align:left; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin:26px 2px 10px; }
+  .items{ display:flex; flex-direction:column; gap:10px; }
+  .empty-items{ text-align:center; color:var(--text-faint); font-size:13.5px; padding:22px; border:1.5px dashed var(--border); border-radius:14px; }
+  .item{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:12px 14px; text-align:left; }
+  .item .info{ display:flex; align-items:center; gap:11px; min-width:0; }
+  .item .icon{ width:38px; height:38px; border-radius:10px; background:var(--cyan-dim); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .item .name{ font-weight:700; font-size:14px; }
+  .item .price{ font-size:12px; color:var(--text-faint); margin-top:1px; }
+  .stepper{ display:flex; align-items:center; gap:9px; flex-shrink:0; }
+  .stepper button{ width:26px; height:26px; border-radius:8px; border:1px solid var(--border); background:#f6f8f9; font-size:15px; font-weight:700; cursor:pointer; color:var(--text); }
+  .stepper .qty{ font-weight:700; font-size:14px; min-width:14px; text-align:center; }
+  .item .remove{ border:none; background:none; color:var(--text-faint); font-size:15px; cursor:pointer; margin-left:2px; }
+
+  .totalbar{ display:flex; justify-content:space-between; align-items:baseline; margin-top:20px; padding:0 4px; }
+  .totalbar .l{ font-size:13px; color:var(--text-dim); }
+  .totalbar .v{ font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; }
+
+  .paymethods{ display:flex; gap:8px; margin-top:16px; }
+  .paymethods .pm{ flex:1; border:1.5px solid var(--border); border-radius:11px; padding:10px 6px; font-size:12px; font-weight:600; color:var(--text-dim); cursor:pointer; text-align:center; }
+  .paymethods .pm.active{ border-color:var(--cyan); color:var(--cyan); background:var(--cyan-dim); }
+
+  .confirm-btn{ width:100%; margin-top:18px; border:none; border-radius:14px; padding:17px; font-size:15.5px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,var(--good),#12805c); color:#fff; box-shadow:0 12px 26px -10px #1fa87666; }
+  .confirm-btn:disabled{ opacity:.4; box-shadow:none; cursor:default; }
+  .status-banner{ margin-top:14px; font-size:13px; padding:11px 14px; border-radius:11px; display:none; }
+  .status-banner.ok{ background:#e8f9f2; color:var(--good); display:block; }
+  .status-banner.err{ background:var(--bad-dim); color:var(--bad); display:block; }
+  .footnote{ margin-top:26px; font-size:11.5px; color:var(--text-faint); line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><div class="mark">R</div><span>RetailSpeak AI</span></div>
+  <div class="navpill"><span class="active">Home</span><span>Track Order</span><span>Support</span></div>
+  <div class="avatar"></div>
+</header>
+
+<main>
+  <div class="orb-wrap">
+    <div class="ring ring1"></div><div class="ring ring2"></div><div class="ring ring3"></div>
+    <div class="orb" id="orb" onclick="toggleListening()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4M8 23h8"/></svg>
+    </div>
+  </div>
+  <div class="orb-hint" id="orbHint">Tap to speak your order</div>
+  <div class="orb-label" id="orbLabel">Roman Urdu, Urdu &amp; English understood</div>
+
+  <div class="transcript placeholder" id="transcriptBox">
+    <div class="urdu-line" id="urduLine">"بھائی، تین کلو آٹا اور دو لیٹر دودھ چاہیئے"</div>
+    <div class="roman" id="romanLine">Roman Urdu: Bhai, teen kilo aata aur do liter doodh chahiye</div>
+  </div>
+
+  <div class="section-label">Order items detected</div>
+  <div class="items" id="items">
+    <div class="empty-items">Nothing detected yet — try the sample phrase above, or tap the mic and speak.</div>
+  </div>
+
+  <div class="totalbar"><span class="l">Total</span><span class="v" id="totalVal">Rs. 0</span></div>
+
+  <div class="section-label">Payment</div>
+  <div class="paymethods">
+    <div class="pm active" data-method="cod" onclick="selectPay(this)">💵 Cash</div>
+    <div class="pm" data-method="easypaisa" onclick="selectPay(this)">📱 EasyPaisa</div>
+    <div class="pm" data-method="jazzcash" onclick="selectPay(this)">📲 JazzCash</div>
+    <div class="pm" data-method="khata" onclick="selectPay(this)">📒 Khata</div>
+  </div>
+
+  <button class="confirm-btn" id="confirmBtn" disabled onclick="confirmOrder()">Confirm order</button>
+  <div class="status-banner" id="statusBanner"></div>
+
+  <div class="footnote">Item matching shown here runs against a small local demo catalog. In production this calls the extract-mentions → rag-retrieval → llm-grounding → validation-gate pipeline before anything reaches your basket.</div>
+</main>
+
+<script>
+const CONFIG = {
+  // Where a confirmed order actually gets submitted once the customer taps
+  // "Confirm order" — this endpoint is real (TDD §4.5).
+  orchestratorBase: "http://localhost:8001",
+};
+
+// Placeholder catalog standing in for rag-retrieval + llm-grounding until
+// that pipeline is fronted by a public endpoint (see file header).
+const DEMO_CATALOG = [
+  { key:"atta", en:"Chakki Atta (10kg)", icon:"🌾", price:350, keywords:["atta","aata","flour"] },
+  { key:"milk", en:"Milk (1L)", icon:"🥛", price:180, keywords:["doodh","milk","dudh"] },
+  { key:"cola", en:"Coca-Cola (1.5L)", icon:"🥤", price:250, keywords:["cola","coke","cold drink"] },
+  { key:"sugar", en:"Sugar (1kg)", icon:"🍚", price:170, keywords:["cheeni","sugar","shakkar"] },
+  { key:"tea", en:"Tea Leaves (250g)", icon:"🍵", price:320, keywords:["chai","tea","patti"] },
+];
+
+let PAY_METHOD = "cod";
+let basket = {}; // key -> {qty, item}
+let recognizing = false, recognition = null;
+
+function selectPay(el){
+  document.querySelectorAll(".pm").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  PAY_METHOD = el.dataset.method;
+}
+
+function toggleListening(){
+  const orb = document.getElementById("orb");
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    // No browser STT support — fall back straight to the demo phrase so
+    // the flow is still explorable.
+    runDemoMatch("bhai teen kilo aata aur do liter doodh chahiye");
+    return;
+  }
+  if (recognizing) { recognition.stop(); return; }
+  recognition = new SR();
+  recognition.lang = "ur-PK";
+  recognition.interimResults = false;
+  recognition.onstart = () => { recognizing = true; orb.classList.add("listening"); document.getElementById("orbHint").textContent = "Listening…"; };
+  recognition.onerror = () => { recognizing = false; orb.classList.remove("listening"); document.getElementById("orbHint").textContent = "Didn't catch that — tap to try again"; };
+  recognition.onend = () => { recognizing = false; orb.classList.remove("listening"); document.getElementById("orbHint").textContent = "Tap to speak your order"; };
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    runDemoMatch(text);
+  };
+  recognition.start();
+}
+
+function runDemoMatch(rawText){
+  const box = document.getElementById("transcriptBox");
+  box.classList.remove("placeholder");
+  document.getElementById("urduLine").textContent = `"${rawText}"`;
+  document.getElementById("urduLine").classList.add("urdu");
+  document.getElementById("romanLine").textContent = "Heard: " + rawText;
+
+  const lower = rawText.toLowerCase();
+  const qtyWords = { teen:3, do:2, ek:1, char:4, panch:5, one:1, two:2, three:3, four:4, five:5 };
+  DEMO_CATALOG.forEach(product => {
+    const hit = product.keywords.some(k => lower.includes(k));
+    if (!hit) return;
+    let qty = 1;
+    for (const [word, n] of Object.entries(qtyWords)) { if (lower.includes(word)) { qty = n; break; } }
+    addToBasket(product, qty);
+  });
+  renderItems();
+}
+
+function addToBasket(product, qty){
+  if (basket[product.key]) basket[product.key].qty += qty;
+  else basket[product.key] = { item: product, qty };
+}
+
+function changeQty(key, delta){
+  if (!basket[key]) return;
+  basket[key].qty += delta;
+  if (basket[key].qty <= 0) delete basket[key];
+  renderItems();
+}
+
+function removeItem(key){ delete basket[key]; renderItems(); }
+
+function renderItems(){
+  const wrap = document.getElementById("items");
+  const keys = Object.keys(basket);
+  if (!keys.length) {
+    wrap.innerHTML = '<div class="empty-items">Nothing detected yet — try the sample phrase above, or tap the mic and speak.</div>';
+    document.getElementById("totalVal").textContent = "Rs. 0";
+    document.getElementById("confirmBtn").disabled = true;
+    return;
+  }
+  let total = 0;
+  wrap.innerHTML = keys.map(k => {
+    const { item, qty } = basket[k];
+    total += item.price * qty;
+    return `
+      <div class="item">
+        <div class="info">
+          <div class="icon">${item.icon}</div>
+          <div><div class="name">${item.en}</div><div class="price">Rs. ${item.price} / unit</div></div>
+        </div>
+        <div class="stepper">
+          <button onclick="changeQty('${k}',-1)">−</button>
+          <span class="qty">${qty}</span>
+          <button onclick="changeQty('${k}',1)">+</button>
+          <button class="remove" onclick="removeItem('${k}')">✕</button>
+        </div>
+      </div>`;
+  }).join("");
+  document.getElementById("totalVal").textContent = "Rs. " + total.toLocaleString();
+  document.getElementById("confirmBtn").disabled = false;
+}
+
+async function confirmOrder(){
+  const banner = document.getElementById("statusBanner");
+  banner.className = "status-banner";
+  const btn = document.getElementById("confirmBtn");
+  btn.disabled = true; btn.textContent = "Placing order…";
+  try {
+    // Real submission target (TDD §4.5) — will 409 without a signed
+    // ConfirmedOrder from the actual NLU pipeline, which is expected
+    // until that pipeline is fronted by a public endpoint (see header).
+    await fetch(`${CONFIG.orchestratorBase}/v1/fulfillment/orders`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payment_method: PAY_METHOD, demo: true }),
+    });
+    banner.classList.add("ok"); banner.textContent = "✓ Order sent to the store.";
+  } catch (e) {
+    banner.classList.add("err"); banner.textContent = "Couldn't reach the order service — check that fulfillment services are running.";
+  } finally {
+    btn.textContent = "Confirm order"; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

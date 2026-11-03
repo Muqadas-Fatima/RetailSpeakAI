@@ -1,0 +1,198 @@
+<!doctype html>
+<!--
+  TDD §2.9 — Warehouse Staff App. Visual redesign only: floor-facing,
+  large tap targets, minimal chrome preserved — every fetch() still
+  targets the real warehouse-stage/orchestrator endpoints from the
+  original file. Barcode/QR scanning still isn't wired (no endpoint/
+  library decision made yet, per Plan §1.6) — tap targets remain ready
+  to receive it later.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RetailSpeak — Warehouse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d17; --panel:#131829; --raised:#1b2138; --border:#242b45; --border-soft:#1c2238;
+    --text:#eef1fb; --text-dim:#9aa1bc; --text-faint:#616a8c;
+    --cyan:#2fe3d6; --cyan-dim:#2fe3d61a; --gold:#f4b942;
+    --good:#34d399; --good-dim:#34d3991a; --bad:#f87171; --bad-dim:#f871711a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{ margin:0; min-height:100vh; background:
+      radial-gradient(700px 380px at 90% -10%, #16214a4d, transparent 60%), var(--bg);
+    color:var(--text); font-family:'Inter',-apple-system,sans-serif; }
+  h1,.disp{ font-family:'Space Grotesk',sans-serif; }
+
+  #login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-card{ width:100%; max-width:360px; background:var(--panel); border:1px solid var(--border); border-radius:20px; padding:34px 28px; text-align:center; }
+  .mark{ width:46px; height:46px; margin:0 auto 16px; border-radius:13px; background:linear-gradient(135deg,var(--cyan),#22b8ae); display:flex; align-items:center; justify-content:center; font-weight:700; color:#04201c; font-size:19px; font-family:'Space Grotesk',sans-serif; }
+  .login-card h1{ font-size:20px; margin:0 0 6px; }
+  .login-card p{ color:var(--text-dim); font-size:13px; margin:0 0 20px; line-height:1.5; }
+  .field{ text-align:left; margin-bottom:14px; }
+  .field label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-bottom:6px; font-weight:700; }
+  .field input{ width:100%; background:var(--raised); border:1px solid var(--border); color:var(--text); padding:13px; border-radius:10px; font-size:15px; font-family:inherit; outline:none; }
+  .field input:focus{ border-color:var(--cyan); }
+  .btn-primary{ width:100%; border:none; padding:14px; border-radius:11px; background:linear-gradient(135deg,var(--cyan),#22b8ae); color:#03201c; font-weight:700; font-size:15px; cursor:pointer; margin-top:4px; }
+  code{ background:var(--raised); padding:1px 5px; border-radius:4px; font-size:12px; }
+
+  #app{ display:none; }
+  header{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; background:#0a0d17cc; backdrop-filter:blur(10px); border-bottom:1px solid var(--border-soft); position:sticky; top:0; z-index:5; }
+  header .htitle{ display:flex; flex-direction:column; }
+  header h1{ font-size:16px; margin:0; }
+  header .sub{ font-size:11.5px; color:var(--text-faint); margin-top:1px; }
+  .live{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim); background:var(--raised); border:1px solid var(--border); padding:5px 10px; border-radius:999px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:var(--bad); box-shadow:0 0 0 3px var(--bad-dim); }
+  .dot.live{ background:var(--good); box-shadow:0 0 0 3px var(--good-dim); animation:pulse 1.8s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.45;} }
+
+  main{ max-width:640px; margin:0 auto; padding:16px 16px 60px; }
+  .stats{ display:flex; gap:10px; margin-bottom:16px; }
+  .stat{ flex:1; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+  .stat .n{ font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; }
+  .stat .l{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+
+  .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 8px 22px -12px rgba(0,0,0,.5); }
+  .card .top{ display:flex; align-items:center; justify-content:space-between; }
+  .card .order{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; }
+  .card .badge{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:4px 9px; border-radius:999px; background:var(--cyan-dim); color:var(--cyan); }
+  .card .meta{ font-size:12.5px; color:var(--text-faint); margin-top:6px; font-family:ui-monospace,Menlo,monospace; }
+  .actions{ display:flex; gap:10px; margin-top:16px; }
+  button{ font-family:inherit; -webkit-tap-highlight-color:transparent; }
+  button.ready{ flex:1; border:none; border-radius:12px; padding:17px 10px; font-size:15.5px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,var(--good),#189a68); color:#052d1d; }
+  button.flag{ flex:1; border:2px solid #f8717155; border-radius:12px; padding:15px 10px; font-size:15.5px; font-weight:700; cursor:pointer; background:transparent; color:var(--bad); }
+  button:disabled{ opacity:.45; }
+  .note-input{ width:100%; padding:12px; margin-top:12px; border:1px solid var(--border); background:var(--raised); color:var(--text); border-radius:9px; display:none; font-size:14px; font-family:inherit; outline:none; }
+  .note-input:focus{ border-color:var(--bad); }
+  .empty{ text-align:center; color:var(--text-faint); padding:70px 10px; font-size:14.5px; }
+  .empty .big{ font-size:38px; display:block; margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-card">
+    <div class="mark">R</div>
+    <h1>Warehouse Staff</h1>
+    <p>Signs in with a <code>warehouse_staff</code> role JWT in production (TDD §8.1).</p>
+    <div class="field"><label>Staff ID</label><input id="staffId" placeholder="staff-1" value="staff-1" /></div>
+    <div class="field"><label>Store ID</label><input id="storeId" value="00000000-0000-0000-0000-000000000001" /></div>
+    <button class="btn-primary" onclick="login()">Start shift →</button>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="htitle"><h1>Pick Queue</h1><div class="sub" id="shiftSub">—</div></div>
+    <div class="live"><span class="dot" id="liveDot"></span><span id="liveText">connecting…</span></div>
+  </header>
+  <main>
+    <div class="stats">
+      <div class="stat"><div class="n" id="statCount">0</div><div class="l">In queue</div></div>
+      <div class="stat"><div class="n" id="statFlagged">0</div><div class="l">Flagged today</div></div>
+    </div>
+    <div id="queue"><div class="empty"><span class="big">📦</span>No active pick lists.</div></div>
+  </main>
+</div>
+
+<script>
+const CONFIG = {
+  warehouseBase: "http://localhost:8003",
+  orchestratorBase: "http://localhost:8001",
+  realtimeWsBase: "ws://localhost:8006",
+};
+let STAFF_ID, STORE_ID, FLAGGED_TODAY = 0;
+
+function login() {
+  STAFF_ID = document.getElementById("staffId").value.trim();
+  STORE_ID = document.getElementById("storeId").value.trim();
+  if (!STAFF_ID || !STORE_ID) return;
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  document.getElementById("shiftSub").textContent = `${STAFF_ID} · store ${STORE_ID.slice(0,8)}…`;
+  loadQueue();
+  connectSocket();
+  setInterval(loadQueue, 15000);
+}
+
+async function loadQueue() {
+  try {
+    const res = await fetch(`${CONFIG.warehouseBase}/internal/warehouse/pick-lists?status=picking`);
+    const lists = await res.json();
+    document.getElementById("statCount").textContent = lists.length;
+    const queue = document.getElementById("queue");
+    if (!lists.length) { queue.innerHTML = '<div class="empty"><span class="big">🎉</span>No active pick lists.</div>'; return; }
+    queue.innerHTML = lists.map(pl => `
+      <div class="card" id="pl-${pl.pick_list_id}">
+        <div class="top">
+          <div class="order">Order ${pl.order_id.slice(0,8)}</div>
+          <span class="badge">picking</span>
+        </div>
+        <div class="meta">pick list ${pl.pick_list_id.slice(0,8)} · reservation ${pl.reservation_id.slice(0,8)}</div>
+        <input class="note-input" id="note-${pl.pick_list_id}" placeholder="What doesn't match? (required to flag)" />
+        <div class="actions">
+          <button class="ready" onclick="markPicked('${pl.order_id}','${pl.reservation_id}','${pl.pick_list_id}', false)">✓ Ready</button>
+          <button class="flag" onclick="toggleNote('${pl.pick_list_id}')" id="flagbtn-${pl.pick_list_id}">⚠ Flag issue</button>
+        </div>
+      </div>
+    `).join("");
+  } catch (e) { console.warn("pick-lists fetch failed", e); }
+}
+
+function toggleNote(pickListId) {
+  const input = document.getElementById(`note-${pickListId}`);
+  if (input.style.display === "block") {
+    if (!input.value.trim()) { input.focus(); return; }
+    markPicked(orderIdFor(pickListId), reservationIdFor(pickListId), pickListId, true, input.value.trim());
+  } else {
+    input.style.display = "block";
+    input.focus();
+  }
+}
+
+const _orderIds = {}, _reservationIds = {};
+function orderIdFor(pl) { return _orderIds[pl]; }
+function reservationIdFor(pl) { return _reservationIds[pl]; }
+
+async function markPicked(orderId, reservationId, pickListId, discrepancy, note) {
+  _orderIds[pickListId] = orderId;
+  _reservationIds[pickListId] = reservationId;
+  const card = document.getElementById(`pl-${pickListId}`);
+  card.querySelectorAll("button").forEach(b => b.disabled = true);
+  if (discrepancy) FLAGGED_TODAY++, document.getElementById("statFlagged").textContent = FLAGGED_TODAY;
+  await fetch(`${CONFIG.warehouseBase}/internal/warehouse/pick`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      order_id: orderId, reservation_id: reservationId,
+      actor: `warehouse_staff:${STAFF_ID}`, discrepancy, discrepancy_note: note || null,
+    }),
+  });
+  await fetch(`${CONFIG.orchestratorBase}/internal/orchestrator/resume/warehouse-pick`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order_id: orderId, actor: `warehouse_staff:${STAFF_ID}`, discrepancy, discrepancy_note: note || null }),
+  });
+  loadQueue();
+}
+
+function connectSocket() {
+  try {
+    const ws = new WebSocket(`${CONFIG.realtimeWsBase}/ws/${STORE_ID}/warehouse_staff`);
+    ws.onopen = () => setLive(true);
+    ws.onclose = () => { setLive(false); setTimeout(connectSocket, 3000); };
+    ws.onerror = () => setLive(false);
+    ws.onmessage = () => loadQueue();
+  } catch (e) { setLive(false); }
+}
+
+function setLive(isLive) {
+  document.getElementById("liveDot").classList.toggle("live", isLive);
+  document.getElementById("liveText").textContent = isLive ? "live" : "reconnecting…";
+}
+</script>
+</body>
+</html>

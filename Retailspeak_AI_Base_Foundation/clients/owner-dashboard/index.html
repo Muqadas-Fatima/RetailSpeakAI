@@ -1,0 +1,402 @@
+<!doctype html>
+<!--
+  TDD §2.9 / Execution Plan Prompt §4 (Phase 4) — Owner dashboard.
+
+  Visual redesign pass only: every fetch()/WebSocket call below targets
+  the same real endpoints as the original file (orchestrator's
+  /internal/orchestrator/orders, supplier-stage's pending-pos +
+  reorder-decision, realtime-gateway's WS). No numbers on this page are
+  fabricated — the KPI row is computed client-side from the same
+  order/PO payloads the tables render, not a separate mocked stats call.
+
+  Still out of scope (see clients/README.md): catalog/pricing,
+  Warehouse Staff provisioning, refund/khata adjustments — no
+  fulfillment-half endpoint backs these yet, so they're not stubbed
+  in here either.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RetailSpeak — Store Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d17; --bg2:#12162699; --panel:#131829; --panel-solid:#131829;
+    --raised:#1b2138; --border:#242b45; --border-soft:#1c2238;
+    --text:#eef1fb; --text-dim:#9aa1bc; --text-faint:#616a8c;
+    --cyan:#2fe3d6; --cyan-dim:#2fe3d61a; --gold:#f4b942; --gold-dim:#f4b9421a;
+    --violet:#8b7cf6; --good:#34d399; --good-dim:#34d3991a;
+    --warn:#f4b942; --warn-dim:#f4b9421a; --bad:#f87171; --bad-dim:#f871711a;
+    --radius:14px; --radius-sm:9px;
+    --shadow: 0 10px 30px -12px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:
+      radial-gradient(1100px 520px at 85% -10%, #16214a55, transparent 60%),
+      radial-gradient(900px 500px at -5% 10%, #0f2a2a4d, transparent 55%),
+      var(--bg);
+    color:var(--text); font-family:'Inter',-apple-system,sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif;}
+  ::selection{background:var(--cyan); color:#04201d;}
+
+  /* ---------- Login ---------- */
+  #login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-card{ width:100%; max-width:380px; background:var(--panel); border:1px solid var(--border); border-radius:20px; padding:36px 32px; box-shadow:var(--shadow); }
+  .login-brand{ display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .login-brand .mark{ width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--cyan),var(--violet)); display:flex; align-items:center; justify-content:center; font-weight:700; color:#081019; font-family:'Space Grotesk',sans-serif;}
+  .login-brand span{ font-weight:600; font-size:15px; letter-spacing:.2px; }
+  .login-card h1{ font-size:21px; margin:0 0 6px; }
+  .login-card p{ color:var(--text-dim); font-size:13px; line-height:1.5; margin:0 0 22px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-bottom:6px; font-weight:600;}
+  .field input{ width:100%; background:var(--raised); border:1px solid var(--border); color:var(--text); padding:12px 13px; border-radius:10px; font-size:14px; font-family:inherit; outline:none; transition:border-color .15s; }
+  .field input:focus{ border-color:var(--cyan); }
+  .btn-primary{ width:100%; border:none; padding:13px; border-radius:10px; background:linear-gradient(135deg,var(--cyan),#22b8ae); color:#03201c; font-weight:700; font-size:14px; cursor:pointer; letter-spacing:.2px; }
+  .btn-primary:hover{ filter:brightness(1.06); }
+  code{ background:var(--raised); padding:1px 5px; border-radius:4px; font-size:12px; }
+
+  /* ---------- Shell ---------- */
+  #app{ display:none; min-height:100vh; }
+  .shell{ display:grid; grid-template-columns:230px 1fr; min-height:100vh; }
+  .sidebar{ background:#0c0f1c; border-right:1px solid var(--border-soft); padding:20px 14px; display:flex; flex-direction:column; gap:4px; position:sticky; top:0; height:100vh; }
+  .sidebar .brand{ display:flex; align-items:center; gap:9px; padding:6px 10px 22px; }
+  .sidebar .brand .mark{ width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--cyan),var(--violet)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#081019; }
+  .sidebar .brand span{ font-weight:700; font-size:14.5px; }
+  .navlabel{ font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); padding:14px 10px 6px; font-weight:700; }
+  .navitem{ display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:9px; color:var(--text-dim); font-size:13.5px; font-weight:500; cursor:pointer; user-select:none; }
+  .navitem svg{ width:16px; height:16px; opacity:.8; flex-shrink:0; }
+  .navitem.active{ background:var(--raised); color:var(--text); }
+  .navitem.active svg{ opacity:1; color:var(--cyan); }
+  .navitem:not(.active):hover{ background:#141a30; color:var(--text); }
+  .sidebar-foot{ margin-top:auto; padding:12px 10px; font-size:11px; color:var(--text-faint); border-top:1px solid var(--border-soft); padding-top:14px; }
+
+  .main{ min-width:0; }
+  header.topbar{ display:flex; align-items:center; justify-content:space-between; padding:16px 26px; border-bottom:1px solid var(--border-soft); background:#0a0d17cc; backdrop-filter:blur(10px); position:sticky; top:0; z-index:5; }
+  .topbar-left h2{ font-size:16px; margin:0; }
+  .topbar-left .store-pill{ font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .live{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text-dim); background:var(--raised); border:1px solid var(--border); padding:6px 12px; border-radius:999px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:var(--bad); box-shadow:0 0 0 3px var(--bad-dim); }
+  .dot.live{ background:var(--good); box-shadow:0 0 0 3px var(--good-dim); animation:pulse 1.8s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.45;} }
+  .avatar{ width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--gold),#e8893a); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px; color:#241300; }
+
+  main.content{ padding:24px 26px 48px; max-width:1400px; }
+
+  /* ---------- KPI cards ---------- */
+  .kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:22px; }
+  .kpi{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px 18px 16px; position:relative; overflow:hidden; }
+  .kpi::after{ content:""; position:absolute; inset:0; background:radial-gradient(120px 80px at 100% 0%, var(--glow,transparent), transparent 70%); pointer-events:none; }
+  .kpi .klabel{ font-size:12px; color:var(--text-dim); display:flex; align-items:center; justify-content:space-between; }
+  .kpi .kicon{ width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+  .kpi .kicon svg{ width:14px; height:14px; }
+  .kpi .kval{ font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:700; margin-top:10px; }
+  .kpi .ksub{ font-size:11.5px; color:var(--text-faint); margin-top:4px; }
+  .kpi.c1{ --glow:#2fe3d61f; } .kpi.c1 .kicon{ background:var(--cyan-dim); color:var(--cyan); }
+  .kpi.c2{ --glow:#f4b9421f; } .kpi.c2 .kicon{ background:var(--gold-dim); color:var(--gold); }
+  .kpi.c3{ --glow:#8b7cf61f; } .kpi.c3 .kicon{ background:#8b7cf61a; color:var(--violet); }
+  .kpi.c4{ --glow:#f871711f; } .kpi.c4 .kicon{ background:var(--bad-dim); color:var(--bad); }
+
+  /* ---------- Grid layout ---------- */
+  .grid2{ display:grid; grid-template-columns:1.15fr .85fr; gap:16px; margin-bottom:16px; align-items:start; }
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
+  .panel-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--border-soft); }
+  .panel-head h3{ font-size:14px; margin:0; font-weight:600; }
+  .panel-head .count{ font-size:11.5px; color:var(--text-faint); font-weight:500; background:var(--raised); padding:2px 9px; border-radius:999px; }
+  .panel-body{ padding:8px 18px 16px; }
+  .panel-body.pad0{ padding:0; }
+
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-soft); }
+  .row:last-child{ border-bottom:none; }
+  .row .rmeta{ font-size:11.5px; color:var(--text-faint); margin-top:3px; }
+  .row .rtitle{ font-size:13.5px; font-weight:600; }
+  .empty{ color:var(--text-faint); font-size:13px; padding:26px 4px; text-align:center; }
+
+  .badge{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:4px 9px; border-radius:999px; white-space:nowrap; }
+  .badge.placed{ background:var(--cyan-dim); color:var(--cyan); }
+  .badge.exception,.badge.failed{ background:var(--bad-dim); color:var(--bad); }
+  .badge.delivered{ background:var(--good-dim); color:var(--good); }
+  .badge.default{ background:var(--gold-dim); color:var(--gold); }
+
+  button.btn{ border:none; border-radius:8px; padding:8px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  button.approve{ background:var(--good); color:#052d1d; }
+  button.reject{ background:transparent; color:var(--bad); border:1px solid #f8717155; }
+  button:disabled{ opacity:.4; cursor:default; }
+  .btnrow{ display:flex; gap:8px; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  thead th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); padding:10px 8px; border-bottom:1px solid var(--border-soft); font-weight:700; }
+  tbody td{ padding:12px 8px; border-bottom:1px solid var(--border-soft); }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#151b32; }
+  .mono{ font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--text-dim); }
+
+  .feed-item{ font-size:12.5px; padding:9px 0; border-bottom:1px dashed var(--border-soft); display:flex; gap:10px; }
+  .feed-item .t{ color:var(--text-faint); font-variant-numeric:tabular-nums; flex-shrink:0; }
+  .feed-item .fdot{ width:6px; height:6px; border-radius:50%; background:var(--cyan); margin-top:6px; flex-shrink:0; }
+
+  .barchart{ display:flex; align-items:flex-end; gap:10px; height:170px; padding:14px 6px 0; }
+  .bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end; }
+  .bar-fill{ width:100%; max-width:34px; border-radius:6px 6px 3px 3px; background:linear-gradient(180deg,var(--cyan),#1a8f86); min-height:4px; transition:height .5s cubic-bezier(.2,.8,.2,1); position:relative; }
+  .bar-fill .bv{ position:absolute; top:-19px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:700; color:var(--text-dim); white-space:nowrap; }
+  .bar-lbl{ font-size:10px; color:var(--text-faint); text-align:center; line-height:1.3; }
+
+  @media (max-width: 980px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ display:none; }
+    .kpis{ grid-template-columns:repeat(2,1fr); }
+    .grid2{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-card">
+    <div class="login-brand"><div class="mark">R</div><span>RetailSpeak AI</span></div>
+    <h1>Store Dashboard</h1>
+    <p>Signs in with an <code>owner</code> role JWT in production (TDD §8.1). This demo takes an owner id directly.</p>
+    <div class="field"><label>Owner ID</label><input id="ownerId" placeholder="owner-1" value="owner-1" /></div>
+    <div class="field"><label>Store ID</label><input id="storeId" value="00000000-0000-0000-0000-000000000001" /></div>
+    <button class="btn-primary" onclick="login()">Connect →</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="mark">R</div><span>RetailSpeak</span></div>
+      <div class="navlabel">Overview</div>
+      <div class="navitem active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</div>
+      <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 6l1.5 13a2 2 0 0 0 2 1.8h11a2 2 0 0 0 2-1.8L21 6M9 10v6M15 10v6"/></svg>Orders</div>
+      <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 2 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l1.5-.9"/><circle cx="18" cy="18" r="3.3"/><path d="m19.9 19.9 1.6 1.6"/></svg>Supplier POs</div>
+      <div class="navlabel">Operations</div>
+      <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h4l3 3v5h-7z"/><circle cx="6" cy="20" r="2"/><circle cx="17.5" cy="20" r="2"/></svg>Dispatch</div>
+      <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Forecast</div>
+      <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>Activity</div>
+      <div class="navlabel">Configure</div>
+      <div class="navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</div>
+      <div class="sidebar-foot">Lahore Grocery Hub #04<br/>v1 · Phase 4</div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2>Store Dashboard</h2>
+          <div class="store-pill" id="storePill">Store —</div>
+        </div>
+        <div class="topbar-right">
+          <div class="live"><span class="dot" id="liveDot"></span><span id="liveText">connecting…</span></div>
+          <div class="avatar" id="avatarInit">O</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="kpis">
+          <div class="kpi c1">
+            <div class="klabel">Revenue (open orders)<div class="kicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div>
+            <div class="kval" id="kpiRevenue">Rs. —</div>
+            <div class="ksub" id="kpiRevenueSub">from live orders feed</div>
+          </div>
+          <div class="kpi c3">
+            <div class="klabel">Orders in flight<div class="kicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 6l1.5 13a2 2 0 0 0 2 1.8h11a2 2 0 0 0 2-1.8L21 6M9 10v6M15 10v6"/></svg></div></div>
+            <div class="kval" id="kpiOrders">—</div>
+            <div class="ksub">store <span id="kpiStoreShort">—</span></div>
+          </div>
+          <div class="kpi c2">
+            <div class="klabel">POs awaiting approval<div class="kicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
+            <div class="kval" id="kpiPO">—</div>
+            <div class="ksub">supplier reorder queue</div>
+          </div>
+          <div class="kpi c4">
+            <div class="klabel">Exceptions<div class="kicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></div></div>
+            <div class="kval" id="kpiExceptions">—</div>
+            <div class="ksub">need attention now</div>
+          </div>
+        </section>
+
+        <section class="grid2">
+          <div class="panel">
+            <div class="panel-head"><h3>Purchase orders awaiting approval</h3><span class="count" id="poCount">0</span></div>
+            <div class="panel-body" id="poList"><div class="empty">No pending POs.</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Orders by stage</h3><span class="count">live</span></div>
+            <div class="panel-body">
+              <div class="barchart" id="stageChart"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid2">
+          <div class="panel" style="grid-column:1/-1">
+            <div class="panel-head"><h3>Orders</h3><span class="count" id="orderCount">0</span></div>
+            <div class="panel-body pad0">
+              <div style="padding:0 18px 6px; overflow-x:auto;">
+              <table>
+                <thead><tr><th>Order</th><th>Amount</th><th>Rider</th><th>Stage</th></tr></thead>
+                <tbody id="orderTable"><tr><td colspan="4" class="empty">No orders yet.</td></tr></tbody>
+              </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid2" style="grid-template-columns:1fr;">
+          <div class="panel">
+            <div class="panel-head"><h3>Live activity</h3></div>
+            <div class="panel-body" id="feed"><div class="empty">Waiting for events…</div></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  supplierBase: "http://localhost:8004",
+  orchestratorBase: "http://localhost:8001",
+  realtimeWsBase: "ws://localhost:8006",
+};
+
+let OWNER_ID, STORE_ID;
+
+function login() {
+  OWNER_ID = document.getElementById("ownerId").value.trim();
+  STORE_ID = document.getElementById("storeId").value.trim();
+  if (!OWNER_ID || !STORE_ID) return;
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  document.getElementById("avatarInit").textContent = OWNER_ID.slice(0,1).toUpperCase();
+  document.getElementById("storePill").textContent = "Store " + STORE_ID.slice(0,8) + "…";
+  document.getElementById("kpiStoreShort").textContent = STORE_ID.slice(0,8) + "…";
+  refreshAll();
+  connectSocket();
+  setInterval(refreshAll, 15000); // REST fallback poll -- WS feed is primary
+}
+
+async function refreshAll() {
+  await Promise.all([loadPendingPOs(), loadOrders()]);
+}
+
+async function loadPendingPOs() {
+  try {
+    const res = await fetch(`${CONFIG.supplierBase}/internal/supplier/pending-pos?store_id=${STORE_ID}`);
+    const pos = await res.json();
+    document.getElementById("poCount").textContent = pos.length;
+    document.getElementById("kpiPO").textContent = pos.length;
+    const list = document.getElementById("poList");
+    if (!pos.length) { list.innerHTML = '<div class="empty">No pending POs.</div>'; return; }
+    list.innerHTML = pos.map(po => `
+      <div class="row" id="po-${po.po_id}">
+        <div>
+          <div class="rtitle">PO ${po.po_id.slice(0,8)}</div>
+          <div class="rmeta">${po.lines.map(l => `${l.reorder_qty} × ${l.product_id.slice(0,8)}`).join(", ")}
+            — triggered by order ${po.triggered_by_order_id ? po.triggered_by_order_id.slice(0,8) : "n/a"}</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn approve" onclick="decidePO('${po.po_id}', 'approved')">Approve</button>
+          <button class="btn reject" onclick="decidePO('${po.po_id}', 'rejected')">Reject</button>
+        </div>
+      </div>
+    `).join("");
+  } catch (e) { console.warn("pending-pos fetch failed", e); }
+}
+
+async function decidePO(poId, decision) {
+  const row = document.getElementById(`po-${poId}`);
+  row.querySelectorAll("button").forEach(b => b.disabled = true);
+  await fetch(`${CONFIG.supplierBase}/internal/supplier/reorder-decision`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ po_id: poId, decision, actor: `owner:${OWNER_ID}` }),
+  });
+  loadPendingPOs();
+}
+
+const STAGE_LABELS = { placed:"Placed", validated:"Validated", inventory_reserved:"Reserved", payment_settled:"Paid",
+  picking:"Picking", ready_for_pickup:"Ready", assigned:"Assigned", out_for_delivery:"Out for delivery", delivered:"Delivered" };
+
+async function loadOrders() {
+  try {
+    const res = await fetch(`${CONFIG.orchestratorBase}/internal/orchestrator/orders?store_id=${STORE_ID}`);
+    const orders = await res.json();
+    document.getElementById("orderCount").textContent = orders.length;
+    document.getElementById("kpiOrders").textContent = orders.length;
+
+    const revenue = orders.reduce((s,o) => s + (o.total_amount || 0), 0);
+    document.getElementById("kpiRevenue").textContent = "Rs. " + revenue.toLocaleString(undefined,{maximumFractionDigits:0});
+
+    const exceptions = orders.filter(o => o.exception_reason).length;
+    document.getElementById("kpiExceptions").textContent = exceptions;
+
+    const table = document.getElementById("orderTable");
+    if (!orders.length) { table.innerHTML = '<tr><td colspan="4" class="empty">No orders yet.</td></tr>'; }
+    else {
+      table.innerHTML = orders.map(o => `
+        <tr>
+          <td class="mono">${o.order_id.slice(0,8)}</td>
+          <td>Rs. ${o.total_amount ?? "—"}</td>
+          <td class="mono">${o.rider_id ? o.rider_id.slice(0,8) : "—"}</td>
+          <td><span class="badge ${o.exception_reason ? 'exception' : (STAGE_LABELS[o.current_stage] ? 'default' : 'default')}">${o.exception_reason ? "⚠ " + o.exception_reason : (STAGE_LABELS[o.current_stage] || o.current_stage.replace(/_/g," "))}</span></td>
+        </tr>
+      `).join("");
+    }
+
+    renderStageChart(orders);
+  } catch (e) { console.warn("orders fetch failed", e); }
+}
+
+function renderStageChart(orders) {
+  const counts = {};
+  orders.forEach(o => { const k = o.current_stage || "unknown"; counts[k] = (counts[k]||0) + 1; });
+  const entries = Object.entries(counts);
+  const el = document.getElementById("stageChart");
+  if (!entries.length) { el.innerHTML = '<div class="empty" style="width:100%">No orders to chart yet.</div>'; return; }
+  const max = Math.max(...entries.map(e => e[1]), 1);
+  el.innerHTML = entries.map(([stage,count]) => `
+    <div class="bar-col">
+      <div class="bar-fill" style="height:${Math.max(6,(count/max)*130)}px"><span class="bv">${count}</span></div>
+      <div class="bar-lbl">${(STAGE_LABELS[stage]||stage).replace(/_/g," ")}</div>
+    </div>
+  `).join("");
+}
+
+function connectSocket() {
+  try {
+    const ws = new WebSocket(`${CONFIG.realtimeWsBase}/ws/${STORE_ID}/owner`);
+    ws.onopen = () => setLive(true);
+    ws.onclose = () => { setLive(false); setTimeout(connectSocket, 3000); };
+    ws.onerror = () => setLive(false);
+    ws.onmessage = (msg) => {
+      const evt = JSON.parse(msg.data);
+      prependFeed(evt);
+      if (evt.extra && evt.extra.po_id) loadPendingPOs();
+      loadOrders();
+    };
+  } catch (e) { setLive(false); }
+}
+
+function setLive(isLive) {
+  document.getElementById("liveDot").classList.toggle("live", isLive);
+  document.getElementById("liveText").textContent = isLive ? "live" : "reconnecting…";
+}
+
+function prependFeed(evt) {
+  const feed = document.getElementById("feed");
+  if (feed.querySelector(".empty")) feed.innerHTML = "";
+  const item = document.createElement("div");
+  item.className = "feed-item";
+  const time = new Date(evt.occurred_at).toLocaleTimeString();
+  item.innerHTML = `<span class="fdot"></span><span class="t">${time}</span><span>order ${evt.order_id.slice(0,8)}: ${evt.detail || evt.stage} <span style="color:var(--text-faint)">(${evt.actor})</span></span>`;
+  feed.prepend(item);
+  while (feed.children.length > 25) feed.removeChild(feed.lastChild);
+}
+</script>
+</body>
+</html>

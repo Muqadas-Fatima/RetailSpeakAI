@@ -1,0 +1,8 @@
+# llm-grounding-service — Phase 1.
+# Real implementation additionally needs a vLLM client (self-hosted
+# Qwen-2.5-7B) and a Groq client for the LLaMA-3.1-8B fallback (TDD
+# §2.5, §14); not pinned yet, per Plan §1.6.
+
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29,<1.0
+pydantic>=2.6,<3.0

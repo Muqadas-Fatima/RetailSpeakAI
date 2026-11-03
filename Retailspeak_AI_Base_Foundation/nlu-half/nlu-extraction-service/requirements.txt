@@ -1,0 +1,8 @@
+# nlu-extraction-service — Phase 1.
+# shared/ (repo root) is not a dependency of this service by design
+# (TDD §2.3: zero egress beyond returning output to caller) — only
+# nlu-half/contracts is needed, mounted alongside this service's code.
+
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29,<1.0
+pydantic>=2.6,<3.0

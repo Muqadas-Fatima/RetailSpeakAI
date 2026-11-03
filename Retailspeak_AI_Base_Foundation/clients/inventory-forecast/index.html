@@ -1,0 +1,252 @@
+<!doctype html>
+<!--
+  NEW — Inventory & Forecast advanced analytics view. Not in original
+  Phase 4 scope. The "Supplier Reorder Queue" panel is real: same
+  supplier-stage endpoints (pending-pos, reorder-decision) as
+  owner-dashboard. The demand-forecast chart and table are demo data
+  shaped exactly like shared/contracts/forecast.py's ForecastRecord
+  (predicted_demand_qty, current_stock_qty, shortage_flag,
+  recommended_restock_qty, model_used) — there is no forecast-service
+  endpoint in this repo yet (Plan §Phase 5 scopes the ML path for
+  later, gated on >=60 days of sales history). Swap DEMO_FORECAST for
+  a real GET once that service exists; nothing else here needs to
+  change since the shape already matches the contract.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RetailSpeak — Inventory &amp; Forecast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d17; --panel:#131829; --raised:#1b2138; --border:#242b45; --border-soft:#1c2238;
+    --text:#eef1fb; --text-dim:#9aa1bc; --text-faint:#616a8c;
+    --cyan:#2fe3d6; --cyan-dim:#2fe3d61a; --gold:#f4b942; --gold-dim:#f4b9421a;
+    --good:#34d399; --good-dim:#34d3991a; --bad:#f87171; --bad-dim:#f871711a; --violet:#8b7cf6;
+    --radius:14px; --shadow:0 10px 30px -12px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; min-height:100vh; background:
+      radial-gradient(1100px 520px at 85% -10%, #16214a55, transparent 60%), var(--bg);
+    color:var(--text); font-family:'Inter',-apple-system,sans-serif; }
+  h1,h2,h3{ font-family:'Space Grotesk',sans-serif; }
+
+  .shell{ display:grid; grid-template-columns:220px 1fr; min-height:100vh; }
+  .sidebar{ background:#0c0f1c; border-right:1px solid var(--border-soft); padding:20px 14px; }
+  .sidebar .brand{ display:flex; align-items:center; gap:9px; padding:6px 10px 20px; }
+  .sidebar .brand .mark{ width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--cyan),var(--violet)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#081019; }
+  .sidebar .brand span{ font-weight:700; font-size:14.5px; }
+  .navitem{ display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:9px; color:var(--text-dim); font-size:13px; font-weight:500; margin-bottom:2px; }
+  .navitem.active{ background:var(--raised); color:var(--text); }
+  .navitem .b{ width:6px; height:6px; border-radius:50%; background:var(--text-faint); }
+  .navitem.active .b{ background:var(--cyan); }
+
+  .main{ padding:0; }
+  header{ display:flex; align-items:center; justify-content:space-between; padding:16px 26px; border-bottom:1px solid var(--border-soft); background:#0a0d17cc; backdrop-filter:blur(10px); position:sticky; top:0; z-index:5; }
+  header h2{ font-size:16px; margin:0; }
+  .tabs{ display:flex; gap:4px; background:var(--raised); padding:4px; border-radius:11px; font-size:12.5px; }
+  .tabs span{ padding:7px 13px; border-radius:8px; color:var(--text-dim); }
+  .tabs span.active{ background:#232a49; color:var(--text); font-weight:600; }
+  .weekpill{ font-size:11.5px; color:var(--text-dim); background:var(--raised); border:1px solid var(--border); padding:6px 12px; border-radius:999px; }
+
+  main.content{ padding:22px 26px 48px; max-width:1420px; }
+  .grid2{ display:grid; grid-template-columns:1.35fr .95fr; gap:16px; margin-bottom:16px; align-items:start; }
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
+  .panel-head{ display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--border-soft); }
+  .panel-head h3{ font-size:14px; margin:0; font-weight:600; }
+  .panel-head .count{ font-size:11px; color:var(--text-faint); background:var(--raised); padding:2px 9px; border-radius:999px; }
+  .panel-body{ padding:14px 18px 18px; }
+  .empty{ color:var(--text-faint); font-size:13px; padding:22px 4px; text-align:center; }
+
+  .legend{ display:flex; gap:14px; font-size:11.5px; color:var(--text-dim); margin-bottom:10px; }
+  .legend span{ display:flex; align-items:center; gap:6px; }
+  .legend i{ width:9px; height:9px; border-radius:3px; display:inline-block; }
+  .chartwrap{ display:flex; align-items:flex-end; gap:16px; height:200px; padding:10px 4px 0; overflow-x:auto; }
+  .grp{ display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end; flex-shrink:0; }
+  .bars{ display:flex; align-items:flex-end; gap:4px; height:100%; }
+  .bars .b{ width:14px; border-radius:4px 4px 2px 2px; min-height:3px; }
+  .bars .b1{ background:linear-gradient(180deg,var(--cyan),#1a8f86); }
+  .bars .b2{ background:linear-gradient(180deg,var(--gold),#b98317); }
+  .bars .b3{ background:linear-gradient(180deg,var(--bad),#a13e3a); }
+  .grp-lbl{ font-size:10.5px; color:var(--text-faint); }
+
+  table{ width:100%; border-collapse:collapse; font-size:12.8px; }
+  thead th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); padding:9px 8px; border-bottom:1px solid var(--border-soft); font-weight:700; }
+  tbody td{ padding:11px 8px; border-bottom:1px solid var(--border-soft); }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#151b32; }
+  .prodcell{ display:flex; align-items:center; gap:9px; }
+  .prodcell .pi{ width:28px; height:28px; border-radius:8px; background:var(--raised); display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .badge{ font-size:10px; font-weight:700; text-transform:uppercase; padding:3px 8px; border-radius:999px; }
+  .badge.risk{ background:var(--bad-dim); color:var(--bad); }
+  .badge.ok{ background:var(--good-dim); color:var(--good); }
+  .conf{ display:flex; align-items:center; gap:7px; }
+  .conf .bar{ width:52px; height:5px; border-radius:3px; background:var(--raised); overflow:hidden; }
+  .conf .fill{ height:100%; background:linear-gradient(90deg,var(--cyan),var(--good)); }
+  .action-link{ font-size:11.5px; color:var(--cyan); cursor:pointer; font-weight:600; }
+
+  .po-row{ padding:12px 0; border-bottom:1px solid var(--border-soft); }
+  .po-row:last-child{ border-bottom:none; }
+  .po-row .pt{ font-size:12.5px; font-weight:700; }
+  .po-row .pm{ font-size:11px; color:var(--text-faint); margin-top:3px; }
+  .btnrow{ display:flex; gap:7px; margin-top:9px; }
+  button.btn{ border:none; border-radius:7px; padding:7px 12px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  button.approve{ background:var(--good); color:#052d1d; }
+  button.reject{ background:transparent; color:var(--bad); border:1px solid #f8717155; }
+  button:disabled{ opacity:.4; }
+
+  .cmdcard{ background:linear-gradient(135deg,#1a2138,#141a2c); border:1px solid var(--border); border-radius:12px; padding:14px; margin-top:12px; }
+  .cmdcard .l{ font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); font-weight:700; margin-bottom:6px; }
+  .cmdcard .cmd{ font-size:13px; }
+  .cmdcard .cmd .urdu{ font-family:inherit; color:var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark">R</div><span>RetailSpeak</span></div>
+    <div class="navitem active"><span class="b"></span>All Categories</div>
+    <div class="navitem"><span class="b"></span>Beverages</div>
+    <div class="navitem"><span class="b"></span>Groceries</div>
+    <div class="navitem"><span class="b"></span>Fresh Produce</div>
+    <div class="navitem"><span class="b"></span>Low Stock</div>
+    <div class="navitem"><span class="b"></span>AI Recommended Actions</div>
+  </aside>
+
+  <div class="main">
+    <header>
+      <h2>Inventory &amp; Forecast</h2>
+      <div class="tabs"><span class="active">Inventory</span><span>Stock Control</span><span>Forecast Details</span><span>Supplier Reordering</span><span>Audit Log</span></div>
+      <div class="weekpill" id="weekPill">Current Week</div>
+    </header>
+
+    <main class="content">
+      <section class="grid2">
+        <div class="panel">
+          <div class="panel-head"><h3>Product stock vs. predicted demand</h3><span class="count">demo forecast</span></div>
+          <div class="panel-body">
+            <div class="legend">
+              <span><i style="background:var(--cyan)"></i>Beverages</span>
+              <span><i style="background:var(--gold)"></i>Groceries</span>
+              <span><i style="background:var(--bad)"></i>High risk</span>
+            </div>
+            <div class="chartwrap" id="chartwrap"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Supplier reorder queue</h3><span class="count" id="poCount">0</span></div>
+          <div class="panel-body" id="poList"><div class="empty">No pending POs.</div></div>
+          <div class="panel-body" style="padding-top:0">
+            <div class="cmdcard">
+              <div class="l">Voice command to supplier</div>
+              <div class="cmd urdu">"Bhai, update supplier reorder for beverages to 150 cases."</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h3>Detailed forecast table</h3><span class="count">demo data — shaped as ForecastRecord</span></div>
+        <div class="panel-body" style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Product</th><th>Category</th><th>Current Stock</th><th>Avg. Weekly Sales</th><th>Next Week Forecast</th><th>Confidence</th><th>Supplier Reorder</th></tr></thead>
+            <tbody id="forecastTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+const CONFIG = { supplierBase: "http://localhost:8004" };
+const STORE_ID = "00000000-0000-0000-0000-000000000001";
+
+// Demo forecast rows, shaped exactly like shared/contracts/forecast.py's
+// ForecastRecord (see file header) — swap for a real GET once a
+// forecast-service endpoint exists.
+const DEMO_FORECAST = [
+  { icon:"🥛", name:"Fresh Milk 1L", category:"Beverages", current_stock_qty:30, avg_weekly_sales:70, predicted_demand_qty:150, confidence:0.82, recommended_restock_qty:120, model_used:"seasonal_heuristic", shortage_flag:true },
+  { icon:"🥤", name:"Coca-Cola 1.5L", category:"Beverages", current_stock_qty:30, avg_weekly_sales:70, predicted_demand_qty:150, confidence:0.78, recommended_restock_qty:120, model_used:"seasonal_heuristic", shortage_flag:true },
+  { icon:"🥤", name:"Coca-Cola 1.5L Can", category:"Groceries", current_stock_qty:30, avg_weekly_sales:70, predicted_demand_qty:150, confidence:0.55, recommended_restock_qty:120, model_used:"seasonal_heuristic", shortage_flag:false },
+  { icon:"🌾", name:"Chakki Atta 10kg", category:"Groceries", current_stock_qty:65, avg_weekly_sales:40, predicted_demand_qty:55, confidence:0.71, recommended_restock_qty:0, model_used:"seasonal_heuristic", shortage_flag:false },
+  { icon:"🍚", name:"Sugar 1kg", category:"Groceries", current_stock_qty:20, avg_weekly_sales:35, predicted_demand_qty:60, confidence:0.64, recommended_restock_qty:40, model_used:"seasonal_heuristic", shortage_flag:true },
+];
+
+const DEMO_CHART_DAYS = ["Mon 15","Tue 16","Wed 17","Thu 25","Fri 26","Sat 27","Sun 28"];
+
+function renderChart(){
+  const wrap = document.getElementById("chartwrap");
+  wrap.innerHTML = DEMO_CHART_DAYS.map(day => {
+    const bev = 40 + Math.round(Math.random()*140);
+    const gro = 30 + Math.round(Math.random()*120);
+    const risk = Math.random() > 0.72 ? 20 + Math.round(Math.random()*90) : 0;
+    const max = 220;
+    return `<div class="grp">
+      <div class="bars">
+        <div class="b b1" style="height:${(bev/max)*170}px" title="Beverages ${bev}"></div>
+        <div class="b b2" style="height:${(gro/max)*170}px" title="Groceries ${gro}"></div>
+        ${risk ? `<div class="b b3" style="height:${(risk/max)*170}px" title="High risk ${risk}"></div>` : ""}
+      </div>
+      <div class="grp-lbl">${day}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderForecastTable(){
+  const tbody = document.getElementById("forecastTable");
+  tbody.innerHTML = DEMO_FORECAST.map(f => `
+    <tr>
+      <td><div class="prodcell"><div class="pi">${f.icon}</div><div>${f.name}</div></div></td>
+      <td>${f.category}</td>
+      <td>${f.current_stock_qty}</td>
+      <td>${f.avg_weekly_sales}</td>
+      <td><strong>${f.predicted_demand_qty}</strong> ${f.shortage_flag ? '<span class="badge risk">shortfall</span>' : '<span class="badge ok">covered</span>'}</td>
+      <td><div class="conf"><div class="bar"><div class="fill" style="width:${f.confidence*100}%"></div></div>${Math.round(f.confidence*100)}%</td>
+      <td>${f.recommended_restock_qty > 0 ? `<span class="action-link">Notify Supplier ↗</span>` : "—"}</td>
+    </tr>
+  `).join("");
+}
+
+async function loadPendingPOs(){
+  try {
+    const res = await fetch(`${CONFIG.supplierBase}/internal/supplier/pending-pos?store_id=${STORE_ID}`);
+    const pos = await res.json();
+    document.getElementById("poCount").textContent = pos.length;
+    const list = document.getElementById("poList");
+    if (!pos.length) { list.innerHTML = '<div class="empty">No pending POs.</div>'; return; }
+    list.innerHTML = pos.map(po => `
+      <div class="po-row" id="po-${po.po_id}">
+        <div class="pt">PO ${po.po_id.slice(0,8)}</div>
+        <div class="pm">${po.lines.map(l => `${l.reorder_qty} × ${l.product_id.slice(0,8)}`).join(", ")}</div>
+        <div class="btnrow">
+          <button class="btn approve" onclick="decidePO('${po.po_id}','approved')">Approve</button>
+          <button class="btn reject" onclick="decidePO('${po.po_id}','rejected')">Reject</button>
+        </div>
+      </div>
+    `).join("");
+  } catch(e) {
+    document.getElementById("poList").innerHTML = '<div class="empty">Couldn\'t reach supplier-stage — is it running on :8004?</div>';
+  }
+}
+
+async function decidePO(poId, decision){
+  const row = document.getElementById(`po-${poId}`);
+  row.querySelectorAll("button").forEach(b => b.disabled = true);
+  await fetch(`${CONFIG.supplierBase}/internal/supplier/reorder-decision`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ po_id: poId, decision, actor: "owner:owner-1" }),
+  });
+  loadPendingPOs();
+}
+
+renderChart();
+renderForecastTable();
+loadPendingPOs();
+</script>
+</body>
+</html>

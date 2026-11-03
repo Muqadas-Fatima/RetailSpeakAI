@@ -1,0 +1,188 @@
+<!doctype html>
+<!--
+  TDD §2.8 / §11 — Rider mobile client. Visual redesign only: the
+  manual "start delivery" / "mark delivered" fallback controls TDD §11
+  requires are preserved as the primary control (no live GPS SDK
+  decision made yet, per Plan §1.6) — every fetch() still targets the
+  real delivery-stage/orchestrator endpoints from the original file.
+  Still no accept/decline on assignment (Plan §6 Open Decisions).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RetailSpeak — Rider</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d17; --panel:#131829; --raised:#1b2138; --border:#242b45; --border-soft:#1c2238;
+    --text:#eef1fb; --text-dim:#9aa1bc; --text-faint:#616a8c;
+    --cyan:#2fe3d6; --cyan-dim:#2fe3d61a; --gold:#f4b942; --gold-dim:#f4b9421a;
+    --good:#34d399; --good-dim:#34d3991a; --bad:#f87171; --bad-dim:#f871711a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{ margin:0; min-height:100vh; background:
+      radial-gradient(700px 380px at 90% -10%, #16214a4d, transparent 60%), var(--bg);
+    color:var(--text); font-family:'Inter',-apple-system,sans-serif; }
+  h1,.disp{ font-family:'Space Grotesk',sans-serif; }
+
+  #login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-card{ width:100%; max-width:360px; background:var(--panel); border:1px solid var(--border); border-radius:20px; padding:34px 28px; text-align:center; }
+  .mark{ width:46px; height:46px; margin:0 auto 16px; border-radius:13px; background:linear-gradient(135deg,var(--gold),#e8893a); display:flex; align-items:center; justify-content:center; font-weight:700; color:#241300; font-size:19px; font-family:'Space Grotesk',sans-serif; }
+  .login-card h1{ font-size:20px; margin:0 0 6px; }
+  .login-card p{ color:var(--text-dim); font-size:13px; margin:0 0 20px; line-height:1.5; }
+  .field{ text-align:left; margin-bottom:14px; }
+  .field label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-bottom:6px; font-weight:700; }
+  .field input{ width:100%; background:var(--raised); border:1px solid var(--border); color:var(--text); padding:13px; border-radius:10px; font-size:15px; font-family:inherit; outline:none; }
+  .field input:focus{ border-color:var(--gold); }
+  .btn-primary{ width:100%; border:none; padding:14px; border-radius:11px; background:linear-gradient(135deg,var(--gold),#e8893a); color:#241300; font-weight:700; font-size:15px; cursor:pointer; margin-top:4px; }
+  code{ background:var(--raised); padding:1px 5px; border-radius:4px; font-size:12px; }
+
+  #app{ display:none; }
+  header{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; background:#0a0d17cc; backdrop-filter:blur(10px); border-bottom:1px solid var(--border-soft); position:sticky; top:0; z-index:5; }
+  header .htitle{ display:flex; flex-direction:column; }
+  header h1{ font-size:16px; margin:0; }
+  header .sub{ font-size:11.5px; color:var(--text-faint); margin-top:1px; }
+  .live{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim); background:var(--raised); border:1px solid var(--border); padding:5px 10px; border-radius:999px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:var(--bad); box-shadow:0 0 0 3px var(--bad-dim); }
+  .dot.live{ background:var(--good); box-shadow:0 0 0 3px var(--good-dim); animation:pulse 1.8s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.45;} }
+
+  main{ max-width:560px; margin:0 auto; padding:16px 16px 60px; }
+  .stats{ display:flex; gap:10px; margin-bottom:16px; }
+  .stat{ flex:1; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+  .stat .n{ font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; }
+  .stat .l{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+
+  .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 8px 22px -12px rgba(0,0,0,.5); position:relative; overflow:hidden; }
+  .card::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--stripe,var(--cyan)); }
+  .card.st-assigned{ --stripe:#2fe3d6; } .card.st-out_for_delivery{ --stripe:#f4b942; } .card.st-delivered{ --stripe:#34d399; }
+  .card .order{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; }
+  .card .addr{ font-size:14.5px; margin-top:7px; color:var(--text); line-height:1.4; }
+  .card .meta{ font-size:12.5px; color:var(--text-faint); margin-top:6px; font-family:ui-monospace,Menlo,monospace; }
+  .badge{ display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:4px 9px; border-radius:999px; margin-top:10px; }
+  .badge.assigned{ background:var(--cyan-dim); color:var(--cyan); }
+  .badge.out_for_delivery{ background:var(--gold-dim); color:var(--gold); }
+  .badge.delivered{ background:var(--good-dim); color:var(--good); }
+  button{ width:100%; border:none; border-radius:13px; padding:18px; font-size:16px; font-weight:700; margin-top:14px; cursor:pointer; font-family:inherit; }
+  button.start{ background:linear-gradient(135deg,var(--cyan),#22b8ae); color:#03201c; }
+  button.delivered{ background:linear-gradient(135deg,var(--good),#189a68); color:#052d1d; }
+  button:disabled{ opacity:.5; }
+  .empty{ text-align:center; color:var(--text-faint); padding:70px 10px; font-size:14.5px; }
+  .empty .big{ font-size:38px; display:block; margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-card">
+    <div class="mark">R</div>
+    <h1>Rider</h1>
+    <p>Signs in with a <code>rider</code> role JWT in production (TDD §8.1).</p>
+    <div class="field"><label>Rider ID</label><input id="riderId" placeholder="rider-1" value="rider-1" /></div>
+    <div class="field"><label>Store ID</label><input id="storeId" value="00000000-0000-0000-0000-000000000001" /></div>
+    <button class="btn-primary" onclick="login()">Go online →</button>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="htitle"><h1>My Deliveries</h1><div class="sub" id="shiftSub">—</div></div>
+    <div class="live"><span class="dot" id="liveDot"></span><span id="liveText">connecting…</span></div>
+  </header>
+  <main>
+    <div class="stats">
+      <div class="stat"><div class="n" id="statActive">0</div><div class="l">Active</div></div>
+      <div class="stat"><div class="n" id="statDone">0</div><div class="l">Delivered today</div></div>
+    </div>
+    <div id="list"><div class="empty"><span class="big">🛵</span>No deliveries assigned yet.</div></div>
+  </main>
+</div>
+
+<script>
+const CONFIG = {
+  deliveryBase: "http://localhost:8005",
+  orchestratorBase: "http://localhost:8001",
+  realtimeWsBase: "ws://localhost:8006",
+};
+let RIDER_ID, STORE_ID, DONE_TODAY = 0;
+
+function login() {
+  RIDER_ID = document.getElementById("riderId").value.trim();
+  STORE_ID = document.getElementById("storeId").value.trim();
+  if (!RIDER_ID || !STORE_ID) return;
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  document.getElementById("shiftSub").textContent = `${RIDER_ID} · store ${STORE_ID.slice(0,8)}…`;
+  loadDeliveries();
+  connectSocket();
+  setInterval(loadDeliveries, 15000);
+}
+
+async function loadDeliveries() {
+  try {
+    const res = await fetch(`${CONFIG.deliveryBase}/internal/delivery/assignments/${RIDER_ID}`);
+    const deliveries = await res.json();
+    const active = deliveries.filter(d => d.status !== "delivered").length;
+    document.getElementById("statActive").textContent = active;
+    const list = document.getElementById("list");
+    if (!deliveries.length) { list.innerHTML = '<div class="empty"><span class="big">🛵</span>No deliveries assigned yet.</div>'; return; }
+    list.innerHTML = deliveries.map(d => `
+      <div class="card st-${d.status}">
+        <div class="order">Order ${d.order_id.slice(0,8)}</div>
+        <div class="addr">${d.delivery_address || "(no address on file)"}</div>
+        <div class="meta">ETA ${d.eta || "—"} · route ${d.route_id || "—"}</div>
+        <span class="badge ${d.status}">${d.status.replace(/_/g," ")}</span>
+        ${renderAction(d)}
+      </div>
+    `).join("");
+  } catch (e) { console.warn("assignments fetch failed", e); }
+}
+
+function renderAction(d) {
+  if (d.status === "assigned") {
+    return `<button class="start" onclick="startDelivery('${d.order_id}')">Start delivery</button>`;
+  }
+  if (d.status === "out_for_delivery") {
+    return `<button class="delivered" onclick="completeDelivery('${d.order_id}')">Mark delivered</button>`;
+  }
+  return "";
+}
+
+async function startDelivery(orderId) {
+  await fetch(`${CONFIG.orchestratorBase}/internal/orchestrator/resume/delivery-status`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order_id: orderId, event: "out_for_delivery" }),
+  });
+  loadDeliveries();
+}
+
+async function completeDelivery(orderId) {
+  await fetch(`${CONFIG.orchestratorBase}/internal/orchestrator/resume/delivery-status`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order_id: orderId, event: "delivered" }),
+  });
+  DONE_TODAY++; document.getElementById("statDone").textContent = DONE_TODAY;
+  loadDeliveries();
+}
+
+function connectSocket() {
+  try {
+    const ws = new WebSocket(`${CONFIG.realtimeWsBase}/ws/${STORE_ID}/rider?recipient_id=${RIDER_ID}`);
+    ws.onopen = () => setLive(true);
+    ws.onclose = () => { setLive(false); setTimeout(connectSocket, 3000); };
+    ws.onerror = () => setLive(false);
+    ws.onmessage = () => loadDeliveries();
+  } catch (e) { setLive(false); }
+}
+
+function setLive(isLive) {
+  document.getElementById("liveDot").classList.toggle("live", isLive);
+  document.getElementById("liveText").textContent = isLive ? "live" : "reconnecting…";
+}
+</script>
+</body>
+</html>
