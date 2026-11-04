@@ -1,0 +1,90 @@
+services:
+  # -------------------------------------------------------------------
+  # 1. PostgreSQL 15+ with pgvector extension (TDD §13.1)
+  # System of Record: Stores, Products, Vectors, Khata, Orders, Inventory
+  # -------------------------------------------------------------------
+  db:
+    image: ankane/pgvector:latest
+    container_name: retailspeak-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: retailspeak
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./nlu-half/sql/full_schema.sql:/docker-entrypoint-initdb.d/01_full_schema.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d retailspeak"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------------
+  # 2. Redis 7 (In-Memory Session Store, Rate Limiting & Pub/Sub EventBus)
+  # -------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: retailspeak-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # -------------------------------------------------------------------
+  # 3. NLU & Grounding Backend API (FastAPI)
+  # -------------------------------------------------------------------
+  backend:
+    build:
+      context: ./nlu-half
+      dockerfile: Dockerfile
+    container_name: retailspeak-backend
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:password@db:5432/retailspeak
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: dev
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # -------------------------------------------------------------------
+  # 4. Next.js Customer Web & Voice Application
+  # -------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./retailai-next
+      dockerfile: Dockerfile
+    container_name: retailspeak-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+
+  # -------------------------------------------------------------------
+  # 5. Static Operations Dashboards (Owner, Warehouse, Rider, Dispatch)
+  # -------------------------------------------------------------------
+  operations-clients:
+    image: nginx:alpine
+    container_name: retailspeak-operations-clients
+    ports:
+      - "8080:80"
+    volumes:
+      - ./Retailspeak_AI_Base_Foundation/clients:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
