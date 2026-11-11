@@ -125,3 +125,7 @@ async def reindex_product(db: AsyncSession, product: Product) -> None:
     product.embedding = embed_text(build_embedding_text(product))
     db.add(product)
     await db.flush()
+    # keep the n-gram index in sync too
+    from app.services.catalog_ngram_service import invalidate_store_index
+
+    invalidate_store_index(product.store_id)

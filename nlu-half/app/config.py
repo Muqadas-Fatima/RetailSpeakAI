@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     rag_similarity_floor: float = 0.72
     rag_auto_accept_threshold: float = 0.85
     rag_top_k: int = 3
+    # Where catalog n-gram match JSON files are saved
+    ngram_output_dir: str = "output/ngram_matches"
 
     # Auth — TDD §14 (AWS Cognito, 4 roles)
     cognito_region: str = "me-south-1"

@@ -13,9 +13,15 @@ from app.core.security import AuthenticatedUser, require_roles
 from app.database import get_db
 from app.redis_client import SessionStore
 from app.schemas.llm import GroundAndAssembleRequest, GroundAndAssembleResponse
-from app.schemas.nlu import ExtractMentionsRequest, ExtractMentionsResponse
+from app.schemas.nlu import (
+    CatalogMatchRequest,
+    CatalogMatchResponse,
+    ExtractMentionsRequest,
+    ExtractMentionsResponse,
+)
 from app.schemas.rag import RagCandidatesRequest
-from app.services import llm_grounding_service, nlu_extraction_service, rag_service
+from app.config import get_settings
+from app.services import catalog_ngram_service, llm_grounding_service, nlu_extraction_service, rag_service
 from app.services.validation_service import validate_draft_order
 
 router = APIRouter(prefix="/v1/nlu", tags=["nlu"])
@@ -91,3 +97,22 @@ async def ground_and_assemble(
     await store.set(payload.session_id, state)
 
     return result
+@router.post("/catalog-match", response_model=CatalogMatchResponse)
+async def catalog_match(
+    payload: CatalogMatchRequest,
+    db: AsyncSession = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_roles("customer", "service")),
+):
+    """Query text -> only product names that exist in this store's catalog,
+    saved as a JSON file and returned."""
+    index = await catalog_ngram_service.load_index_for_store(db, payload.store_id)
+    result = catalog_ngram_service.match_products(payload.input_text, index, fuzzy=payload.fuzzy)
+
+    out_dir = get_settings().ngram_output_dir
+    safe_session = "".join(c for c in payload.session_id if c.isalnum() or c in "-_")[:64] or "session"
+    path = catalog_ngram_service.write_json(
+        {"session_id": payload.session_id, **result},
+        f"{out_dir}/{safe_session}.json",
+    )
+
+    return CatalogMatchResponse(session_id=payload.session_id, json_file=str(path), **result)

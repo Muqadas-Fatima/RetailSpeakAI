@@ -43,3 +43,27 @@ class ExtractMentionsResponse(BaseModel):
     intent_confidence: float = Field(default=0.95, ge=0.0, le=1.0)
     language_detected: list[str] = Field(default_factory=lambda: ["ur", "en"])
     mentions: list[MentionSpan] = Field(default_factory=list)
+
+# ---- Catalog n-gram matching ---- #
+class CatalogMatchRequest(BaseModel):
+    session_id: str
+    store_id: uuid.UUID
+    input_text: str = Field(min_length=1, max_length=2000)
+    fuzzy: bool = True
+
+
+class CatalogMention(BaseModel):
+    mention: str
+    match_type: str
+    score: float
+    product_names: list[str]
+    product_ids: list[str]
+    ambiguous: bool = False
+
+
+class CatalogMatchResponse(BaseModel):
+    session_id: str
+    query: str
+    product_names: list[str] = Field(default_factory=list)
+    matches: list[CatalogMention] = Field(default_factory=list)
+    json_file: str | None = None
