@@ -12,12 +12,13 @@ Dockerfile would change.
 import logging
 
 import structlog
-from fastapi import FastAPI, status
+from fastapi import Depends, FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.core.exceptions import register_exception_handlers
+from app.core.security import AuthenticatedUser, get_current_user
 from app.routers import nlu, rag, voice_ws
 
 settings = get_settings()
@@ -60,7 +61,10 @@ app.include_router(voice_ws.router)
 @app.get("/healthz", tags=["ops"])
 async def healthz():
     return {"status": "ok", "environment": settings.environment}
-
+@app.get("/v1/me", tags=["auth"])
+async def me(user: AuthenticatedUser = Depends(get_current_user)):
+    """Auth smoke test: returns who the verified token says you are."""
+    return {"sub": user.sub, "role": user.role, "token_use": user.claims.get("token_use")}    
 
 @app.get("/readyz", tags=["ops"])
 async def readyz():

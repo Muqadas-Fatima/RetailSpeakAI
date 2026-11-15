@@ -47,27 +47,47 @@ class TranscriptResult:
         }
 
 
-async def _transcribe_with_groq(audio_bytes: bytes, filename: str = "audio.opus") -> TranscriptResult:
-    start = time.monotonic()
+# Only these spoken languages are supported. Whisper's auto-detect covers ~99
+# languages, and Urdu speech is often labelled Hindi/Punjabi/Arabic/Persian.
+_ALLOWED_LANGS = {"en": "en", "english": "en", "ur": "ur", "urdu": "ur"}
+
+
+def _lang_code(name: str | None) -> str | None:
+    return _ALLOWED_LANGS.get((name or "").strip().lower())
+
+
+def _mostly_latin(text: str) -> bool:
+    letters = [c for c in text if c.isalpha()]
+    return bool(letters) and sum(c.isascii() for c in letters) / len(letters) > 0.8
+
+
+async def _groq_call(audio_bytes: bytes, filename: str, language: str | None = None):
+    extra = {"language": language} if language else {}
+    return await asyncio.wait_for(
+        _groq_client.audio.transcriptions.create(
+            file=(filename, io.BytesIO(audio_bytes)),
+            model=settings.groq_whisper_model,
+            response_format="verbose_json",
+            **extra,
+        ),
+        timeout=settings.asr_circuit_breaker_timeout_seconds,
+    )
+
+
+async def _transcribe_with_groq(audio_bytes: bytes, filename: str = "audio.webm") -> TranscriptResult:
     try:
-        resp = await asyncio.wait_for(
-            _groq_client.audio.transcriptions.create(
-                file=(filename, io.BytesIO(audio_bytes)),
-                model=settings.groq_whisper_model,
-                response_format="verbose_json",
-                # let Whisper auto-detect among Urdu/English rather than pin one
-            ),
-            timeout=settings.asr_circuit_breaker_timeout_seconds,
-        )
+        resp = await _groq_call(audio_bytes, filename)
+        detected = (getattr(resp, "language", "") or "").strip().lower()
+        if _lang_code(detected) is None:
+            forced = "en" if _mostly_latin(resp.text or "") else "ur"
+            print(f"[ASR] detected '{detected}' -> re-running as '{forced}'")
+            resp = await _groq_call(audio_bytes, filename, language=forced)
     except (asyncio.TimeoutError, Exception) as exc:
+        print(f"[ASR] Groq failed: {exc!r}")
         _breaker.record_failure()
         raise AsrUnavailable(f"Groq ASR failed: {exc}") from exc
 
-    elapsed = time.monotonic() - start
-    if elapsed > settings.asr_circuit_breaker_timeout_seconds:
-        _breaker.record_failure()
-    else:
-        _breaker.record_success()
+    _breaker.record_success()
 
     segments = getattr(resp, "segments", None) or []
     language_segments = [
@@ -88,7 +108,6 @@ async def _transcribe_with_groq(audio_bytes: bytes, filename: str = "audio.opus"
         confidence=round(confidence, 2),
         is_final=True,
     )
-
 
 async def _transcribe_with_transcribe_fallback(audio_bytes: bytes) -> TranscriptResult:
     """AWS Transcribe fallback with custom Urdu vocabulary — TDD §2.2.

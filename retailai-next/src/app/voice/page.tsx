@@ -25,7 +25,8 @@ import {
   type VoiceQuickAction,
 } from "@/lib/catalog";
 import { interpret } from "@/lib/voice/engine";
-import { sanitizeTranscript, useLiveMic } from "@/lib/voice/live-mic";
+import { sanitizeTranscript } from "@/lib/voice/live-mic";
+import { useBackendMic } from "@/lib/voice/backend-mic";
 import { cn } from "@/lib/utils";
 
 
@@ -131,8 +132,8 @@ function VoiceOrderingScreen() {
   /** Real browser microphone capture — permissions, security and errors handled.
    *  Transcribed speech fills the text field so the user can review it before
    *  pressing Send — the mic button transcribes, the send button submits. */
-  const mic = useLiveMic({
-    onTranscript: (text) => setDraft(text),
+  const mic = useBackendMic({
+    onTranscript: () => {},
     lang: language === "ur" ? "ur-PK" : "en-US",
   });
   const listening = mic.isListening;

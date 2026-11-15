@@ -43,6 +43,13 @@ from typing import Iterable
 
 from rapidfuzz import fuzz, process
 
+from app.services.urdu_support import (
+    MAX_SUBPHRASE_PRODUCTS,
+    URDU_SYNONYMS,
+    has_urdu,
+    prepare_query,
+    urdu_subphrases,
+)
 # --------------------------------------------------------------------------- #
 # Tunables (move to Settings / per-store config later if you want, same as
 # rag_similarity_floor)
@@ -73,13 +80,14 @@ _NON_PRODUCT_WORDS = {
 _ARABIC_DIACRITICS_RE = re.compile(r"[\u064B-\u065F\u0670\u06D6-\u06ED]")
 _PUNCT_RE = re.compile(r"[^\w\s\u0600-\u06FF]", re.UNICODE)
 
-
+_URDU_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 # --------------------------------------------------------------------------- #
 # Normalization
 # --------------------------------------------------------------------------- #
 def normalize(text: str) -> str:
     """lowercase, unify unicode, drop Urdu diacritics + punctuation, collapse spaces."""
     text = unicodedata.normalize("NFKC", text).lower()
+    text = text.translate(_URDU_DIGITS)
     text = _ARABIC_DIACRITICS_RE.sub("", text)
     text = text.replace("ي", "ی").replace("ك", "ک")  # Arabic -> Urdu letter forms
     text = _PUNCT_RE.sub(" ", text)
@@ -185,14 +193,45 @@ class CatalogIndex:
                     if entry not in bucket:
                         bucket.append(entry)
                     self.max_n = max(self.max_n, len(toks))
-
+        self._add_urdu_support()
         self.max_n = min(self.max_n, MAX_NGRAM_CAP)
         # fuzzy candidates grouped by word-count so a 2-word n-gram is only
         # compared to 2-word catalog phrases (fast + more accurate)
         self._phrases_by_len: dict[int, list[str]] = {}
         for phrase in self.phrase_to_entries:
             self._phrases_by_len.setdefault(len(phrase.split()), []).append(phrase)
+    def _add_urdu_support(self) -> None:
+        """Index Urdu-script words inside product names + Urdu spellings of
+        generic words (see urdu_support.py)."""
+        # (a) every word / word-group inside an Urdu product name
+        extra: dict[str, list[CatalogEntry]] = {}
+        for phrase, entries in list(self.phrase_to_entries.items()):
+            if not has_urdu(phrase):
+                continue
+            for sub in urdu_subphrases(phrase):
+                if sub in self.phrase_to_entries:
+                    continue  # already an exact catalog phrase: keep it as is
+                bucket = extra.setdefault(sub, [])
+                for entry in entries:
+                    if entry not in bucket:
+                        bucket.append(entry)
+        for sub, entries in extra.items():
+            if len(entries) <= MAX_SUBPHRASE_PRODUCTS:
+                self.phrase_to_entries[sub] = entries
+                self.max_n = max(self.max_n, len(sub.split()))
 
+        # (b) Urdu spellings of generic words -> products with the Roman alias
+        for roman, spellings in URDU_SYNONYMS.items():
+            entries = self.phrase_to_entries.get(normalize(roman))
+            if not entries:
+                continue
+            for spelling in spellings:
+                key = normalize(spelling)
+                bucket = self.phrase_to_entries.setdefault(key, [])
+                for entry in entries:
+                    if entry not in bucket:
+                        bucket.append(entry)
+                self.max_n = max(self.max_n, len(key.split()))
     @staticmethod
     def _variants(raw: str) -> set[str]:
         """normalized phrase + the same phrase with size tokens removed."""
@@ -289,7 +328,7 @@ class CatalogIndex:
 # --------------------------------------------------------------------------- #
 def match_products(query: str, index: CatalogIndex, fuzzy: bool = True) -> dict:
     """query text -> JSON-serializable dict containing the matched product names."""
-    matches = index.match(query, fuzzy=fuzzy)
+    matches = index.match(prepare_query(query), fuzzy=fuzzy)
 
     names: list[str] = []
     for m in matches:

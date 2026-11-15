@@ -1,4 +1,6 @@
 "use client";
+import "@/lib/cognito";
+import "@/lib/amplify-client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";

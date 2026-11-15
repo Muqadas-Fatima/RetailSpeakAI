@@ -19,41 +19,51 @@ Protocol implemented here:
     living in the WebRTC client, not this service (TDD §2.1).
 """
 import json
+import uuid
 
+import httpx
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect, status
-from jose import JOSEError, jwt
+from jose.exceptions import JOSEError
 
 from app.config import get_settings
 from app.core.exceptions import AsrUnavailable
-from app.core.security import _get_signing_key
+from app.core.security import decode_cognito_token
+from app.database import AsyncSessionLocal
 from app.redis_client import SessionStore
+from app.services import catalog_ngram_service
 from app.services.asr_service import transcribe
-
+from app.services.llm_input_writer import write_llm_input
 router = APIRouter(tags=["voice"])
 settings = get_settings()
 
 
 async def _authenticate_ws(token: str) -> str:
-    """WebSockets can't carry an Authorization header from browser
-    clients, so the token is passed as a query param; validated with the
-    same Cognito JWKS check as the REST endpoints."""
-    unverified_header = jwt.get_unverified_header(token)
-    kid = unverified_header.get("kid")
-    signing_key = await _get_signing_key(kid) if kid else None
-    if signing_key is None:
-        raise JOSEError("Unable to verify token signature")
-    claims = jwt.decode(
-        token, signing_key, algorithms=["RS256"], audience=settings.cognito_app_client_id
-    )
+    """Browsers can't send an Authorization header on a WebSocket, so the
+    token arrives as a query param and is verified by the same Cognito
+    check as the REST endpoints."""
+    claims = await decode_cognito_token(token)
     return claims["sub"]
+
+
+async def _match_catalog(store_uuid: uuid.UUID, text: str) -> dict:
+    """Transcript text -> product names that exist in this store's catalog."""
+    async with AsyncSessionLocal() as db:
+        index = await catalog_ngram_service.load_index_for_store(db, store_uuid)
+    return catalog_ngram_service.match_products(text, index, fuzzy=True)
 
 
 @router.websocket("/v1/voice/sessions/{session_id}/stream")
 async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query(...), store_id: str = Query(...)):
     try:
         customer_sub = await _authenticate_ws(token)
-    except JOSEError:
+    except (JOSEError, httpx.HTTPError):
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or expired token")
+        return
+
+    try:
+        store_uuid = uuid.UUID(store_id)
+    except ValueError:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="store_id must be a UUID")
         return
 
     await websocket.accept()
@@ -91,6 +101,22 @@ async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query
                         continue
                     await websocket.send_json(result.to_dict())
                     audio_buffer.clear()
+
+                    if result.transcript.strip():
+                        try:
+                            match = await _match_catalog(store_uuid, result.transcript)
+                            write_llm_input(
+                                session_id=session_id,
+                                store_id=store_id,
+                                transcript=result.transcript,
+                                language_segments=result.language_segments,
+                                match=match,
+                            )
+                            await websocket.send_json({"type": "catalog.matches", **match})
+                        except Exception as exc:
+                            await websocket.send_json(
+                                {"type": "error", "error": "catalog_match_failed", "detail": str(exc)}
+                            )
 
                 elif msg_type == "partial_request":
                     if not audio_buffer:

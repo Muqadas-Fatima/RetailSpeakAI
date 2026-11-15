@@ -1,13 +1,9 @@
 """
-Auth — TDD §14: "AWS Cognito (4 roles: Customer, Owner, Warehouse Staff,
-Rider) — Managed JWT issuance with OTP/MFA support and per-role claim
-scoping." The NLU half is customer-facing (voice/chat ordering), so its
-endpoints accept `customer` role tokens; internal service-to-service calls
-(e.g. a dialogue manager calling on a customer's behalf) use a service
-role claim instead.
+Auth — TDD §14: AWS Cognito JWT verification with per-role claim scoping.
 
-JWKS is fetched once and cached; production Cognito key rotation is
-handled by re-fetching on a `kid` cache-miss rather than a fixed TTL.
+Accepts both Cognito access tokens and ID tokens. Every token must pass:
+signature (Cognito JWKS), expiry, issuer (our user pool), token type, and
+app-client match (access token -> `client_id`, ID token -> `aud`).
 """
 from typing import Any
 
@@ -15,7 +11,7 @@ import httpx
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
-from jose.exceptions import JOSEError
+from jose.exceptions import JOSEError, JWTError
 
 from app.config import get_settings
 
@@ -23,6 +19,10 @@ settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=True)
 
 _jwks_cache: dict[str, Any] = {}
+
+
+def _issuer() -> str:
+    return f"https://cognito-idp.{settings.cognito_region}.amazonaws.com/{settings.cognito_user_pool_id}"
 
 
 async def _get_jwks() -> dict[str, Any]:
@@ -50,6 +50,38 @@ async def _get_signing_key(kid: str) -> dict[str, Any] | None:
     return None
 
 
+async def decode_cognito_token(token: str) -> dict[str, Any]:
+    """Verify a Cognito JWT and return its claims. Raises JOSEError on any failure."""
+    header = jwt.get_unverified_header(token)
+    kid = header.get("kid")
+    if kid is None:
+        raise JWTError("Invalid token header")
+
+    signing_key = await _get_signing_key(kid)
+    if signing_key is None:
+        raise JWTError("Unable to verify token signature")
+
+    claims = jwt.decode(
+        token,
+        signing_key,
+        algorithms=["RS256"],
+        issuer=_issuer(),
+        options={"verify_aud": False, "verify_at_hash": False, "verify_exp": True},
+    )
+
+    token_use = claims.get("token_use")
+    if token_use == "access":
+        client = claims.get("client_id")
+    elif token_use == "id":
+        client = claims.get("aud")
+    else:
+        raise JWTError("Unsupported token_use")
+    if client != settings.cognito_app_client_id:
+        raise JWTError("Token was not issued for this app client")
+
+    return claims
+
+
 class AuthenticatedUser:
     def __init__(self, sub: str, role: str, claims: dict[str, Any]):
         self.sub = sub
@@ -60,28 +92,15 @@ class AuthenticatedUser:
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> AuthenticatedUser:
-    token = credentials.credentials
     try:
-        unverified_header = jwt.get_unverified_header(token)
-        kid = unverified_header.get("kid")
-        if kid is None:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token header")
-
-        signing_key = await _get_signing_key(kid)
-        if signing_key is None:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Unable to verify token signature")
-
-        claims = jwt.decode(
-            token,
-            signing_key,
-            algorithms=["RS256"],
-            audience=settings.cognito_app_client_id,
-            options={"verify_exp": True},
-        )
+        claims = await decode_cognito_token(credentials.credentials)
     except JOSEError as exc:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, f"Invalid or expired token: {exc}") from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Unable to fetch Cognito signing keys") from exc
 
-    role = claims.get("custom:role") or claims.get("cognito:groups", [None])[0]
+    groups = claims.get("cognito:groups") or []
+    role = claims.get("custom:role") or (groups[0] if groups else None)
     if role is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Token carries no role claim")
 
