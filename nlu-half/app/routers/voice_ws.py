@@ -1,24 +1,22 @@
 """
-Voice Session -> ASR — TDD §4.1: "WS /v1/voice/sessions/{session_id}/stream
-— binary Opus frames in, JSON transcript events out."
+Voice / text session — TDD §4.1: "WS /v1/voice/sessions/{session_id}/stream".
 
-Protocol implemented here:
-  - Client sends binary WebSocket frames of Opus-encoded audio
-    (client already handles jitter buffering per §2.1 — this endpoint
-    just accumulates what it's given).
-  - Client sends a text control frame `{"type": "end_of_turn"}` when the
-    customer stops speaking; the server transcribes the accumulated
-    buffer and emits a `transcript.final` event, then clears the buffer
-    for the next turn.
-  - Client may send `{"type": "partial_request"}` at any point to get a
-    best-effort `transcript.partial` from whatever audio has arrived so
-    far (used for live-captioning UX; not authoritative).
-  - On disconnect/reconnect, session audio state is NOT preserved across
-    a socket drop (only the Redis *conversation* state is) — matches the
-    PRD's client-side "handle reconnect on network drop" responsibility
-    living in the WebRTC client, not this service (TDD §2.1).
+Client -> server
+  binary frame                      audio (WebM/Opus) for the current voice turn
+  {"type": "end_of_turn"}           customer stopped speaking: transcribe, then run the order pipeline
+  {"type": "text", "text": "..."}   typed message: skips speech-to-text, same order pipeline
+  {"type": "partial_request"}       best-effort partial transcript
+  {"type": "end_session"}           close
+
+Server -> client
+  transcript.final / transcript.partial     speech-to-text result (voice only)
+  order.update                               result of one turn: reply, order, clarification questions
+  error                                      {"error": "...", "detail": "..."}
+
+Voice and typed turns share one session, so they build the same running order.
 """
 import json
+import logging
 import uuid
 
 import httpx
@@ -28,13 +26,15 @@ from jose.exceptions import JOSEError
 from app.config import get_settings
 from app.core.exceptions import AsrUnavailable
 from app.core.security import decode_cognito_token
-from app.database import AsyncSessionLocal
 from app.redis_client import SessionStore
-from app.services import catalog_ngram_service
+from app.services import turn_pipeline_service
 from app.services.asr_service import transcribe
-from app.services.llm_input_writer import write_llm_input
+
 router = APIRouter(tags=["voice"])
 settings = get_settings()
+logger = logging.getLogger(__name__)
+
+MAX_TEXT_CHARS = 500
 
 
 async def _authenticate_ws(token: str) -> str:
@@ -45,11 +45,31 @@ async def _authenticate_ws(token: str) -> str:
     return claims["sub"]
 
 
-async def _match_catalog(store_uuid: uuid.UUID, text: str) -> dict:
-    """Transcript text -> product names that exist in this store's catalog."""
-    async with AsyncSessionLocal() as db:
-        index = await catalog_ngram_service.load_index_for_store(db, store_uuid)
-    return catalog_ngram_service.match_products(text, index, fuzzy=True)
+def _public_update(result: dict) -> dict:
+    """What the client needs from a turn result (no internal file paths)."""
+    return {
+        "type": "order.update",
+        "source": result.get("source"),
+        "transcript": result.get("transcript"),
+        "status": result.get("status"),
+        "reply": result.get("reply"),
+        "blocks_confirmation": result.get("blocks_confirmation"),
+        "subtotal": result.get("subtotal"),
+        "order": result.get("order"),
+        "clarifications": result.get("clarifications", []),
+        "not_found": result.get("not_found", []),
+        "reason": result.get("reason"),
+    }
+
+
+async def _run_turn(websocket: WebSocket, **kwargs) -> None:
+    try:
+        result = await turn_pipeline_service.run_turn(**kwargs)
+    except Exception:  # never let one bad turn kill the socket
+        logger.exception("order pipeline failed")
+        await websocket.send_json({"type": "error", "error": "order_pipeline_failed"})
+        return
+    await websocket.send_json(_public_update(result))
 
 
 @router.websocket("/v1/voice/sessions/{session_id}/stream")
@@ -66,6 +86,11 @@ async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="store_id must be a UUID")
         return
 
+    try:
+        customer_uuid = uuid.UUID(customer_sub)
+    except ValueError:
+        customer_uuid = None
+
     await websocket.accept()
 
     session_store = SessionStore()
@@ -77,6 +102,9 @@ async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query
         while True:
             message = await websocket.receive()
 
+            if message.get("type") == "websocket.disconnect":
+                return
+
             if message.get("bytes") is not None:
                 audio_buffer.extend(message["bytes"])
                 continue
@@ -87,6 +115,9 @@ async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query
                 except json.JSONDecodeError:
                     await websocket.send_json({"type": "error", "error": "invalid_control_frame"})
                     continue
+                if not isinstance(control, dict):
+                    await websocket.send_json({"type": "error", "error": "invalid_control_frame"})
+                    continue
 
                 msg_type = control.get("type")
 
@@ -94,29 +125,38 @@ async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query
                     if not audio_buffer:
                         await websocket.send_json({"type": "error", "error": "no_audio_received"})
                         continue
+                    audio = bytes(audio_buffer)
+                    audio_buffer.clear()  # every turn is a fresh recording (own WebM header)
                     try:
-                        result = await transcribe(bytes(audio_buffer))
+                        result = await transcribe(audio)
                     except AsrUnavailable as exc:
                         await websocket.send_json({"type": "error", "error": "asr_unavailable", "detail": str(exc)})
                         continue
                     await websocket.send_json(result.to_dict())
-                    audio_buffer.clear()
 
                     if result.transcript.strip():
-                        try:
-                            match = await _match_catalog(store_uuid, result.transcript)
-                            write_llm_input(
-                                session_id=session_id,
-                                store_id=store_id,
-                                transcript=result.transcript,
-                                language_segments=result.language_segments,
-                                match=match,
-                            )
-                            await websocket.send_json({"type": "catalog.matches", **match})
-                        except Exception as exc:
-                            await websocket.send_json(
-                                {"type": "error", "error": "catalog_match_failed", "detail": str(exc)}
-                            )
+                        await _run_turn(
+                            websocket,
+                            store=session_store, session_id=session_id, store_id=store_uuid,
+                            text=turn_pipeline_service.clean_text(result.transcript), source="voice",
+                            language_segments=result.language_segments, customer_id=customer_uuid,
+                        )
+
+                elif msg_type == "text":
+                    raw = control.get("text")
+                    if isinstance(raw, str) and len(raw) > MAX_TEXT_CHARS:
+                        await websocket.send_json({"type": "error", "error": "text_too_long"})
+                        continue
+                    text = turn_pipeline_service.clean_text(raw)
+                    if not text:
+                        await websocket.send_json({"type": "error", "error": "empty_text"})
+                        continue
+                    turn_id = str(control.get("turn_id") or "")[:64] or None
+                    await _run_turn(
+                        websocket,
+                        store=session_store, session_id=session_id, store_id=store_uuid,
+                        text=text, source="text", turn_id=turn_id, customer_id=customer_uuid,
+                    )
 
                 elif msg_type == "partial_request":
                     if not audio_buffer:
@@ -132,8 +172,6 @@ async def voice_stream(websocket: WebSocket, session_id: str, token: str = Query
                     break
 
     except WebSocketDisconnect:
-        # Client-side reconnect handling owns recovery (TDD §2.1); nothing
-        # to compensate here since only in-flight (unbuffered-to-Redis)
-        # audio for the current turn is lost, matching FA's stated
-        # session-expiry baseline for partial-turn loss.
+        # Client-side reconnect handling owns recovery (TDD §2.1); only in-flight
+        # audio of the current turn is lost.
         return

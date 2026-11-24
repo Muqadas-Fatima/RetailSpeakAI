@@ -50,6 +50,7 @@ from app.services.urdu_support import (
     prepare_query,
     urdu_subphrases,
 )
+
 # --------------------------------------------------------------------------- #
 # Tunables (move to Settings / per-store config later if you want, same as
 # rag_similarity_floor)
@@ -66,6 +67,13 @@ _SIZE_TOKEN_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Packaging words. Alone they are not a product ("coke 1 liter bottle" must not
+# match a Water Bottle); they only count when nothing else was named.
+_GENERIC_PACKAGING_WORDS = {
+    "bottle", "bottles", "botal", "bottol", "pack", "packs", "can", "cans", "tin", "tins",
+    "box", "boxes", "bag", "bags", "jar", "jars", "carton", "cartons", "pouch", "sachet",
+}
+
 # Words that are never product names on their own. They are only used to stop
 # the FUZZY pass from matching junk; the exact pass doesn't need them.
 _NON_PRODUCT_WORDS = {
@@ -79,8 +87,9 @@ _NON_PRODUCT_WORDS = {
 
 _ARABIC_DIACRITICS_RE = re.compile(r"[\u064B-\u065F\u0670\u06D6-\u06ED]")
 _PUNCT_RE = re.compile(r"[^\w\s\u0600-\u06FF]", re.UNICODE)
-
 _URDU_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+
+
 # --------------------------------------------------------------------------- #
 # Normalization
 # --------------------------------------------------------------------------- #
@@ -193,6 +202,7 @@ class CatalogIndex:
                     if entry not in bucket:
                         bucket.append(entry)
                     self.max_n = max(self.max_n, len(toks))
+
         self._add_urdu_support()
         self.max_n = min(self.max_n, MAX_NGRAM_CAP)
         # fuzzy candidates grouped by word-count so a 2-word n-gram is only
@@ -200,6 +210,7 @@ class CatalogIndex:
         self._phrases_by_len: dict[int, list[str]] = {}
         for phrase in self.phrase_to_entries:
             self._phrases_by_len.setdefault(len(phrase.split()), []).append(phrase)
+
     def _add_urdu_support(self) -> None:
         """Index Urdu-script words inside product names + Urdu spellings of
         generic words (see urdu_support.py)."""
@@ -232,6 +243,7 @@ class CatalogIndex:
                     if entry not in bucket:
                         bucket.append(entry)
                 self.max_n = max(self.max_n, len(key.split()))
+
     @staticmethod
     def _variants(raw: str) -> set[str]:
         """normalized phrase + the same phrase with size tokens removed."""
@@ -301,6 +313,14 @@ class CatalogIndex:
                         ))
                         for k in range(i, i + n):
                             claimed[k] = True
+
+        # a bare packaging word is only a product when it is the only thing named
+        generic = {
+            id(m) for m in matches
+            if m.end - m.start == 1 and tokens[m.start] in _GENERIC_PACKAGING_WORDS
+        }
+        if generic and len(generic) < len(matches):
+            matches = [m for m in matches if id(m) not in generic]
 
         matches.sort(key=lambda m: m.start)  # keep the order the customer spoke
         self._narrow_by_size(query, matches)

@@ -1,9 +1,13 @@
 "use client";
 /**
- * Backend-streaming microphone hook.
- * Same return shape as useLiveMic, but audio is recorded with MediaRecorder
- * and streamed over a WebSocket to the backend (Whisper -> catalog N-gram
- * match) instead of using browser SpeechRecognition.
+ * Backend session hook: microphone streaming AND typed text over one WebSocket.
+ *
+ *  - Voice : MediaRecorder -> WebSocket -> speech-to-text -> catalog N-gram -> LLM order JSON
+ *  - Typing: sendText()    -> WebSocket ->                    catalog N-gram -> LLM order JSON
+ *
+ * Both paths end in an `order.update` event (reply, order, clarification
+ * question) delivered to `onOrderUpdate`. Voice and typed turns share one
+ * session on the server, so they build the same running order.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -14,7 +18,7 @@ import {
   type MicErrorKind,
   type MicStatus,
 } from "./live-mic";
-import { VoiceSocket, type CatalogMatch, type VoiceServerEvent } from "./ws-client";
+import { VoiceSocket, type CatalogMatch, type OrderUpdate, type VoiceServerEvent } from "./ws-client";
 
 const MESSAGES: Record<MicErrorKind, string> = {
   "insecure-context": "Microphone needs a secure (HTTPS) connection.",
@@ -37,7 +41,10 @@ function pickMimeType(): string | undefined {
 
 export type UseBackendMicOptions = {
   onTranscript: (text: string) => void;
-  onMatches?: (matches: CatalogMatch[], productNames: string[]) => void;
+  /** Called for every finished turn, typed or spoken. */
+  onOrderUpdate?: (update: OrderUpdate) => void;
+  /** Called when the server reports an error for a turn. */
+  onServerError?: (code: string) => void;
   lang?: string; // kept for API parity with useLiveMic (backend auto-detects)
   maxListenMs?: number;
   sessionTimeoutMs?: number;
@@ -45,7 +52,8 @@ export type UseBackendMicOptions = {
 
 export function useBackendMic({
   onTranscript,
-  onMatches,
+  onOrderUpdate,
+  onServerError,
   maxListenMs = 12_000,
   sessionTimeoutMs = 5 * 60_000,
 }: UseBackendMicOptions) {
@@ -67,8 +75,10 @@ export function useBackendMic({
   const expiresAtRef = useRef<number>(Date.now() + sessionTimeoutMs);
   const onTranscriptRef = useRef(onTranscript);
   onTranscriptRef.current = onTranscript;
-  const onMatchesRef = useRef(onMatches);
-  onMatchesRef.current = onMatches;
+  const onOrderUpdateRef = useRef(onOrderUpdate);
+  onOrderUpdateRef.current = onOrderUpdate;
+  const onServerErrorRef = useRef(onServerError);
+  onServerErrorRef.current = onServerError;
 
   const releaseStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -139,16 +149,21 @@ export function useBackendMic({
             return;
           }
           onTranscriptRef.current(text);
-          return; // catalog.matches follows
+          return; // order.update follows
         }
+        case "order.update":
+          clearProcessingTimer();
+          onOrderUpdateRef.current?.(event);
+          setStatus((current) => (current === "processing" ? "idle" : current));
+          return;
         case "catalog.matches":
           clearProcessingTimer();
           setMatches(event.matches);
-          onMatchesRef.current?.(event.matches, event.product_names);
-          setStatus("idle");
+          setStatus((current) => (current === "processing" ? "idle" : current));
           return;
         case "error":
           clearProcessingTimer();
+          onServerErrorRef.current?.(event.error);
           setError(err("unknown", `Voice service error: ${event.error}`));
           setStatus("error");
           return;
@@ -169,6 +184,21 @@ export function useBackendMic({
     socketRef.current = socket;
     return socket;
   }, [handleEvent]);
+
+  /** Typed message -> same pipeline as voice (minus speech-to-text). */
+  const sendText = useCallback(
+    async (text: string): Promise<boolean> => {
+      touchSession();
+      try {
+        const socket = await ensureSocket();
+        return socket.sendText(text, crypto.randomUUID());
+      } catch (cause) {
+        console.error("[voice] typed message failed:", cause);
+        return false;
+      }
+    },
+    [ensureSocket, touchSession],
+  );
 
   const stop = useCallback(() => {
     clearListenTimer();
@@ -272,6 +302,7 @@ export function useBackendMic({
     start,
     stop,
     toggle,
+    sendText,
     resumeSession: touchSession,
     dismissError: () => {
       setError(null);

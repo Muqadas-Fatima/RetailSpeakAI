@@ -17,3 +17,6 @@ output/
 venv/*.rar
 *.rar
 venv/
+
+*.zip
+.next/

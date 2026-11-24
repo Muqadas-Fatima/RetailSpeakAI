@@ -40,6 +40,8 @@ class OrderLineItem(BaseModel):
     unit: str
     unit_price: float = Field(ge=0)
     raw_mention: str  # what the customer actually said, kept for audit/debugging
+    note: str | None = None  # optional customer instruction, e.g. "thanda" / "fresh"    
+    action: str = "add"  # add | remove | reduce | set_quantity
 
     @field_validator("quantity")
     @classmethod

@@ -10,6 +10,48 @@ export type CatalogMatch = {
   size_hint: string | null;
 };
 
+export type OrderLine = {
+  matched_name: string;
+  quantity: number;
+  unit: string;
+  unit_price: number;
+  line_total: number;
+  note?: string | null;
+};
+
+export type Clarification = {
+  pending_id: string;
+  raw_mention: string;
+  question: string | null;
+  requested_quantity: number | null;
+  options: { product_id: string; name: string; unit: string; price: number }[];
+};
+
+/** Result of one turn (typed or spoken) after catalog matching + the LLM order step. */
+export type OrderUpdate = {
+  type: "order.update";
+  source: "voice" | "text";
+  transcript: string;
+  status:
+    | "ready_to_confirm"
+    | "needs_clarification"
+    | "partially_resolved"
+    | "nothing_found"
+    | "validation_failed"
+    | "llm_unavailable"
+    | "confirmed"
+    | "cleared"
+    | "order_empty";
+  /** Plain-language reply for the customer (includes any clarification question). */
+  reply: string;
+  blocks_confirmation: boolean;
+  subtotal: number;
+  order: { lines: OrderLine[] } | null;
+  clarifications: Clarification[];
+  not_found: string[];
+  reason: string | null;
+};
+
 export type VoiceServerEvent =
   | {
       type: "transcript.partial" | "transcript.final";
@@ -24,6 +66,7 @@ export type VoiceServerEvent =
       product_names: string[];
       matches: CatalogMatch[];
     }
+  | OrderUpdate
   | { type: "error"; error: string; detail?: string };
 
 export class VoiceSocket {
@@ -74,6 +117,13 @@ export class VoiceSocket {
 
   endOfTurn(): void {
     if (this.isOpen) this.ws!.send(JSON.stringify({ type: "end_of_turn" }));
+  }
+
+  /** Typed message: skips speech-to-text, same order pipeline as voice. */
+  sendText(text: string, turnId: string): boolean {
+    if (!this.isOpen) return false;
+    this.ws!.send(JSON.stringify({ type: "text", text, turn_id: turnId }));
+    return true;
   }
 
   close(): void {

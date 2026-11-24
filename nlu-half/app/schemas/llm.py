@@ -22,12 +22,16 @@ class GroundAndAssembleRequest(BaseModel):
     mentions: list[dict] = Field(default_factory=list)  # MentionSpan.model_dump()
     candidates: dict[str, list[RagCandidate]] = Field(default_factory=dict)
     language_mix: list[str] = Field(default_factory=list)
+    transcript: str | None = None  # the customer's full sentence (lets the LLM read quantities)
 
 
 class AmbiguousItem(BaseModel):
     raw_mention: str
     options: list[str]  # human-readable candidate names, e.g. "Basmati Rice 1kg"
     option_product_ids: list[uuid.UUID]
+    question: str | None = None  # the clarification question to ask the customer
+    requested_quantity: float | None = None  # quantity the customer asked for (kept for the next turn)
+    action: str = "add"  # add | remove | reduce | set_quantity (kept for the next turn)
 
 
 class GroundAndAssembleResponse(BaseModel):

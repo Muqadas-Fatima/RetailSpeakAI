@@ -51,6 +51,13 @@ function VoiceOrderingScreen() {
   const [thinking, setThinking] = useState(false);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement | null>(null);
+  // A typed message waiting for the backend's answer
+  const awaitingText = useRef(false);
+  const finishTextTurn = (message: string) => {
+    awaitingText.current = false;
+    setConversation((prev) => [...prev, { role: "ai", text: message, time: now() }]);
+    setThinking(false);
+  };
 
   useEffect(() => {
     setConversation((prev) => {
@@ -64,6 +71,13 @@ function VoiceOrderingScreen() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [conversation, thinking]);
+  useEffect(() => {
+    if (!thinking || !awaitingText.current) return;
+    const id = window.setTimeout(() => {
+      if (awaitingText.current) finishTextTurn("The order service is taking too long. Please try again.");
+    }, 30_000);
+    return () => window.clearTimeout(id);
+  }, [thinking]);
 
   /** Single pipeline: user text -> engine -> conversation + cart/nav effects. */
   const send = (text: string) => {
@@ -78,6 +92,20 @@ function VoiceOrderingScreen() {
       total,
       ...(lastOrder ? { lastOrderId: lastOrder.id } : {}),
     });
+      // "show my cart", "checkout", "clear", "remove ...", "repeat last order" and "show menu"
+    // are handled locally. Everything else is an order and goes to the backend pipeline.
+    const localEffects: string[] = ["navigate", "browse-menu", "clear", "repeat-last-order", "remove"];
+    if (!localEffects.includes(turn.effect.type)) {
+      awaitingText.current = true;
+      void mic.sendText(input).then((ok) => {
+        if (!ok && awaitingText.current) {
+          finishTextTurn("Sorry, I couldn't reach the order service. Please try again.");
+        }
+      });
+      return;
+    }  
+  
+    
 
     window.setTimeout(() => {
       switch (turn.effect.type) {
@@ -132,9 +160,17 @@ function VoiceOrderingScreen() {
   /** Real browser microphone capture — permissions, security and errors handled.
    *  Transcribed speech fills the text field so the user can review it before
    *  pressing Send — the mic button transcribes, the send button submits. */
-  const mic = useBackendMic({
+    const mic = useBackendMic({
     onTranscript: () => {},
     lang: language === "ur" ? "ur-PK" : "en-US",
+    onOrderUpdate: (update) => {
+      awaitingText.current = false;
+      setConversation((prev) => [...prev, { role: "ai", text: update.reply, time: now() }]);
+      setThinking(false);
+    },
+    onServerError: () => {
+      if (awaitingText.current) finishTextTurn("Sorry, something went wrong. Please try again.");
+    },
   });
   const listening = mic.isListening;
 
